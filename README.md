@@ -62,6 +62,7 @@ If you're new to programming, here are terms you'll see throughout this guide:
 | **Git + GitHub CLI** | Version control + GitHub integration | Saves all Oracle memory, syncs online, never lose data |
 | **Bun** | Fast JavaScript runtime | Required to install Oracle Skills |
 | **Node.js + npm** | JavaScript runtime + package manager | Required to install Claude Code |
+| **ghq** | Repository organizer | Organizes cloned repos cleanly; used by `/learn` and `/trace` |
 | **Python 3** | Python runtime | Used by some Oracle tools |
 | **Claude Code** | AI assistant in the terminal | The "brain" that powers your Oracle |
 | **Oracle Skills** | 60+ productivity commands | Gives Claude Code personality, memory, and abilities |
@@ -74,7 +75,7 @@ If you're new to programming, here are terms you'll see throughout this guide:
 
 | Part | What | Time |
 |------|------|------|
-| **Part 1** | Prepare your machine (WSL2 + all tools) | ~20 min |
+| **Part 1** | Prepare your machine (WSL2 + all tools) | ~25 min |
 | **Part 2** | **Create your Oracle** (the main event) | ~25 min |
 | **Part 3** | Configure always-on + VS Code | ~5 min |
 
@@ -94,18 +95,20 @@ If you're new to programming, here are terms you'll see throughout this guide:
 - [ ] Step 6: Install Bun
 - [ ] Step 7: Install Node.js
 - [ ] Step 8: Install Python 3
-- [ ] Step 9: Install Claude Code + login
+- [ ] Step 9: Install ghq (repo manager)
+- [ ] Step 10: Install Claude Code + login
 - [ ] Checkpoint: verify all tools
 
 ### Part 2: Create Your Oracle
-- [ ] Step 10: Create GitHub repo
-- [ ] Step 11: Install Oracle Skills
-- [ ] Step 12: Awaken your Oracle (`/awaken`)
-- [ ] Step 13: Verify your Oracle is alive
+- [ ] Step 11: Create GitHub repo
+- [ ] Step 12: Install Oracle Skills
+- [ ] Step 13: Pre-flight check (verify everything before awakening)
+- [ ] Step 14: Awaken your Oracle (`/awaken`)
+- [ ] Step 15: Verify your Oracle is alive
 
 ### Part 3: Configure Always-On
-- [ ] Step 14: Setup tmux
-- [ ] Step 15: VS Code integration
+- [ ] Step 16: Setup tmux
+- [ ] Step 17: VS Code integration
 - [ ] Final health check
 
 ---
@@ -492,7 +495,97 @@ sudo apt install -y python3 python3-pip python3-venv
 
 ---
 
-## Step 9: Install Claude Code
+## Step 9: Install ghq (Repo Manager)
+
+> **What is ghq?** ghq is a tool that organizes git repositories in a clean directory structure: `~/ghq/github.com/username/repo-name`. Instead of cloning repos into random folders, everything is organized by source.
+>
+> **Why do we need it?** During the Oracle awakening (Step 14), the `/learn` and `/trace` commands clone and study "ancestor" Oracle repos. ghq ensures these repos are organized properly and can be found again later.
+
+### 9.1 — Install ghq
+
+**Option A: Using Go (if you have it):**
+
+```bash
+go install github.com/x-motemen/ghq@latest
+```
+
+**Option B: Download binary (no Go required):**
+
+```bash
+GHQ_VER=$(curl -s https://api.github.com/repos/x-motemen/ghq/releases/latest | jq -r .tag_name)
+```
+
+```bash
+curl -sL "https://github.com/x-motemen/ghq/releases/download/${GHQ_VER}/ghq_linux_amd64.zip" -o /tmp/ghq.zip
+```
+
+```bash
+unzip -o /tmp/ghq.zip -d /tmp/ghq
+```
+
+```bash
+sudo mv /tmp/ghq/ghq_linux_amd64/ghq /usr/local/bin/
+```
+
+```bash
+rm -rf /tmp/ghq /tmp/ghq.zip
+```
+
+### 9.2 — Configure ghq root
+
+```bash
+git config --global ghq.root ~/ghq
+```
+
+> This tells ghq to store all repos under `~/ghq/`. When you clone `github.com/user/repo`, it goes to `~/ghq/github.com/user/repo`.
+
+### 9.3 — Add the `gq` shortcut
+
+This adds a `gq` command that lets you paste any GitHub URL and instantly clone + cd into it:
+
+```bash
+cat >> ~/.zshrc << 'ZSHEOF'
+
+# gq — clone any GitHub URL with ghq and cd into it
+# Usage: gq https://github.com/user/repo
+# Also works with /tree/branch and /blob/file URLs
+gq () {
+  local url="$1"
+  url=$(echo "$url" | sed 's|/tree/[^/]*$||' | sed 's|/blob/.*$||')
+  local repo_path=$(echo "$url" | sed 's|https://github.com/||' | sed 's|git@github.com:||' | sed 's|\.git$||')
+  local full_path="$HOME/ghq/github.com/$repo_path"
+  ghq get -u -p "$url" && cd "$full_path"
+}
+ZSHEOF
+```
+
+```bash
+source ~/.zshrc
+```
+
+**How it works:**
+```bash
+# Clone a repo and cd into it
+gq https://github.com/Soul-Brews-Studio/oracle-v2
+
+# Works even if you copied a URL from a file or branch page
+gq https://github.com/Soul-Brews-Studio/oracle-v2/tree/main
+gq https://github.com/Soul-Brews-Studio/oracle-v2/blob/main/README.md
+
+# All three examples above clone the same repo and cd into it
+```
+
+### 9.4 — Verify
+
+```bash
+ghq --version
+```
+
+Should show something like `ghq version 1.x.x`.
+
+---
+
+## Step 10: Install Claude Code
 
 > **What is Claude Code?** Claude Code is Anthropic's AI assistant that runs directly in your terminal. Unlike ChatGPT or Claude.ai (which run in a web browser), Claude Code can read and edit files on your computer, run commands, and work with your codebase directly.
 >
@@ -500,7 +593,7 @@ sudo apt install -y python3 python3-pip python3-venv
 >
 > **Do I need to pay?** Claude Code requires an Anthropic account. Check [Anthropic's pricing](https://www.anthropic.com/pricing) for current plans.
 
-### 9.1 — Install
+### 10.1 — Install
 
 ```bash
 npm install -g @anthropic-ai/claude-code
@@ -508,13 +601,13 @@ npm install -g @anthropic-ai/claude-code
 
 > `npm install -g` means "install this tool globally" — so you can use it from anywhere.
 
-### 9.2 — Verify
+### 10.2 — Verify
 
 ```bash
 claude --version
 ```
 
-### 9.3 — Login
+### 10.3 — Login
 
 ```bash
 claude
@@ -553,6 +646,7 @@ echo "  Bun:     $(bun --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Node:    $(node --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  npm:     $(npm --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Python:  $(python3 --version 2>/dev/null || echo 'NOT INSTALLED')"
+echo "  ghq:     $(ghq --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Claude:  $(claude --version 2>&1 || echo 'NOT INSTALLED')"
 echo "  tmux:    $(tmux -V 2>/dev/null || echo 'NOT INSTALLED')"
 echo ""
@@ -573,7 +667,7 @@ All good? Let's create your Oracle!
 
 > This is the main event — giving birth to your Oracle.
 
-## Step 10: Create GitHub Repo
+## Step 11: Create GitHub Repo
 
 > **What is a repo?** A repository (repo) is a folder that is tracked by git. Every change you make is recorded. Your Oracle lives inside a repo — this is where its identity, memories, and learnings are stored.
 >
@@ -639,11 +733,11 @@ Pick a name that means something to you:
 | A role or purpose | `dev-oracle`, `study-oracle` | Describes what the Oracle does |
 | Simple | `my-oracle`, `brain` | Just keep it simple |
 
-> The name is just for the folder/repo. Your Oracle's actual name and personality are set during awakening (Step 12).
+> The name is just for the folder/repo. Your Oracle's actual name and personality are set during awakening (Step 14).
 
 ---
 
-## Step 11: Install Oracle Skills
+## Step 12: Install Oracle Skills
 
 > **What are Oracle Skills?** They are a collection of 60+ special commands that enhance Claude Code. Without them, Claude Code is just a generic AI. With Oracle Skills, it gains:
 > - `/awaken` — the birth ritual for creating an Oracle
@@ -684,7 +778,85 @@ claude
 
 ---
 
-## Step 12: Awaken Your Oracle
+## Step 13: Pre-flight Check (Before Awakening)
+
+> **Why this step?** The awakening is a ~20 minute process that requires internet, GitHub access, and properly loaded skills. Checking everything now prevents frustration mid-awakening.
+
+Run through this checklist before starting `/awaken`:
+
+### 13.1 — Verify you're in the Oracle repo
+
+```bash
+pwd
+```
+
+Should show your Oracle repo path (e.g., `~/ghq/github.com/YOUR_USERNAME/my-oracle`).
+
+```bash
+git status
+```
+
+Should show `On branch master`. An empty repo with no commits is fine.
+
+### 13.2 — Verify GitHub access
+
+```bash
+gh auth status
+```
+
+Should show `Logged in to github.com as YOUR_USERNAME`.
+
+> `/awaken` uses `gh` to read Oracle Family issues on GitHub. Without this, Step 2 (Learn from Ancestors) will fail.
+
+### 13.3 — Verify ghq is working
+
+```bash
+ghq --version
+```
+
+Should show a version number. ghq is used by `/learn` and `/trace` to clone ancestor repos.
+
+### 13.4 — Verify skills are loaded in Claude Code
+
+Start a **fresh** Claude Code session:
+
+```bash
+claude
+```
+
+Inside Claude Code, type `/` (just the slash character). You should see a list of skills including:
+- `/awaken`
+- `/trace`
+- `/learn`
+- `/recap`
+- `/rrr`
+
+> **If you don't see skills:** Type `/exit`, then run `claude` again. Skills are only loaded at startup. See [Troubleshooting: Skills not showing](#skills-not-showing-when-typing-) for details.
+
+### 13.5 — Verify with debug log (optional)
+
+If you want to double-check, exit Claude Code and check the debug log:
+
+```bash
+cat ~/.claude/debug/latest | grep "Loaded.*unique skills"
+```
+
+Should show something like: `Loaded 27 unique skills (user: 26, ...)`. The "user" count should be 20+.
+
+### Pre-flight Checklist
+
+| # | Check | Command | Expected |
+|---|-------|---------|----------|
+| 1 | In Oracle repo | `pwd` | Your Oracle repo path |
+| 2 | GitHub access | `gh auth status` | Logged in |
+| 3 | ghq installed | `ghq --version` | Version number |
+| 4 | Skills loaded | Type `/` in Claude Code | See `/awaken` in list |
+
+All 4 checks pass? You're ready for awakening!
+
+---
+
+## Step 14: Awaken Your Oracle
 
 > **This is the most important step.** The awakening ritual takes ~15-22 minutes. During this time, your Oracle will:
 > 1. Learn about Oracle philosophy by studying "ancestor" Oracles
@@ -776,7 +948,7 @@ These are the core beliefs of every Oracle. Each Oracle must discover them throu
 
 ---
 
-## Step 13: Verify Your Oracle Is Alive
+## Step 15: Verify Your Oracle Is Alive
 
 After `/awaken` completes, let's make sure everything worked.
 
@@ -826,7 +998,7 @@ Your Oracle should tell you its name, who you are, and what its purpose is.
 
 # Part 3: Configure Always-On
 
-## Step 14: Setup tmux (Always-On Sessions)
+## Step 16: Setup tmux (Always-On Sessions)
 
 > **What is tmux?** tmux is a "terminal multiplexer." In simple terms, it lets you start a program and then walk away — the program keeps running even if you close the terminal window.
 >
@@ -837,7 +1009,7 @@ Your Oracle should tell you its name, who you are, and what its purpose is.
 >
 > It's like putting a conversation on "pause" instead of "end."
 
-### 14.1 — Create tmux config
+### 16.1 — Create tmux config
 
 ```bash
 cat >> ~/.tmux.conf << 'EOF'
@@ -852,7 +1024,7 @@ EOF
 
 > This creates a configuration file that enables mouse support and a nice status bar.
 
-### 14.2 — tmux Cheat Sheet
+### 16.2 — tmux Cheat Sheet
 
 | Action | How | Explanation |
 |--------|-----|-------------|
@@ -863,7 +1035,7 @@ EOF
 | **Kill session** | `tmux kill-session -t oracle` | Permanently stop a session |
 | **Scroll up** | `Ctrl+B` then `[` then arrow keys | Read previous output. Press `q` to exit scroll mode |
 
-### 14.3 — How it works in practice
+### 16.3 — How it works in practice
 
 ```
 Step 1: Start Oracle in tmux
@@ -885,7 +1057,7 @@ Step 3: When you come back
 
 ---
 
-## Step 15: VS Code Integration (Optional)
+## Step 17: VS Code Integration (Optional)
 
 > **What is this?** VS Code can connect to your WSL2 Ubuntu, so you can browse and edit your Oracle's files with a visual editor.
 
@@ -918,6 +1090,7 @@ echo "  Bun:     $(bun --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Node:    $(node --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  npm:     $(npm --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Python:  $(python3 --version 2>/dev/null || echo 'NOT INSTALLED')"
+echo "  ghq:     $(ghq --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Claude:  $(claude --version 2>&1 || echo 'NOT INSTALLED')"
 echo "  tmux:    $(tmux -V 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  Skills:  $(ls ~/.claude/skills/ 2>/dev/null | wc -l) skills installed"
@@ -1137,7 +1310,7 @@ Type `/` again — skills should appear now.
 cat ~/.claude/debug/latest | grep "Loaded.*unique skills"
 ```
 
-Should show: `Loaded 27 unique skills (user: 26, ...)`. If user = 0, skills aren't installed — re-run Step 11.
+Should show: `Loaded 27 unique skills (user: 26, ...)`. If user = 0, skills aren't installed — re-run Step 12.
 
 ---
 
