@@ -141,10 +141,21 @@ sudo apt update && sudo apt upgrade -y
 ```bash
 sudo apt install -y build-essential curl wget unzip zip git \
   ca-certificates gnupg lsb-release software-properties-common \
-  tmux htop jq
+  tmux htop jq zsh
 ```
 
 > `sudo` will ask for the password you set in Step 1.
+
+### Check your shell
+
+```bash
+echo $SHELL
+```
+
+- If it shows `/bin/bash` → you're on **bash** (default)
+- If it shows `/bin/zsh` or `/usr/bin/zsh` → you're on **zsh**
+
+> **Important:** The rest of this guide uses `source ~/.bashrc` for bash users. If you're on **zsh**, replace with `source ~/.zshrc` everywhere. See the [Bash vs Zsh](#bash-vs-zsh) section for details.
 
 ---
 
@@ -213,7 +224,11 @@ curl -fsSL https://bun.sh/install | bash
 **Reload shell** (important!):
 
 ```bash
+# bash users:
 source ~/.bashrc
+
+# zsh users:
+source ~/.zshrc
 ```
 
 Verify:
@@ -235,7 +250,11 @@ curl -fsSL https://fnm.vercel.app/install | bash
 **Reload shell:**
 
 ```bash
+# bash users:
 source ~/.bashrc
+
+# zsh users:
+source ~/.zshrc
 ```
 
 Install Node.js 22 (LTS):
@@ -578,7 +597,11 @@ Paste your token when prompted.
 Reload your shell:
 
 ```bash
+# bash users:
 source ~/.bashrc
+
+# zsh users:
+source ~/.zshrc
 ```
 
 Or close and reopen Ubuntu terminal.
@@ -611,8 +634,19 @@ If you get `EACCES` errors:
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
+```
+
+```bash
+# bash users:
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
+
+# zsh users:
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
+source ~/.zshrc
+```
+
+```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
@@ -667,6 +701,40 @@ Same result, different installer. No extra layer needed.
 │  └──────────┘  └──────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
+
+---
+
+## Bash vs Zsh
+
+Ubuntu defaults to **bash**, but some setups use **zsh** instead. Both work fine — just use the right config file.
+
+| | Bash | Zsh |
+|---|------|-----|
+| Config file | `~/.bashrc` | `~/.zshrc` |
+| Reload | `source ~/.bashrc` | `source ~/.zshrc` |
+| Check which | `echo $SHELL` | `echo $SHELL` |
+| Switch to bash | `chsh -s /bin/bash` | — |
+| Switch to zsh | — | `chsh -s $(which zsh)` |
+
+### If you installed tools with bash but switched to zsh
+
+Some installers (bun, fnm) add config lines to `~/.bashrc`. If you're on zsh, those lines won't load. Fix it:
+
+```bash
+# Copy bun/fnm config from bashrc to zshrc
+grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
+source ~/.zshrc
+```
+
+### Common zsh error: `shopt: command not found`
+
+If you see this error:
+
+```
+/home/user/.bashrc:16: command not found: shopt
+```
+
+It means zsh is trying to source `.bashrc` which contains bash-only commands. **Don't source `.bashrc` from zsh.** Use `source ~/.zshrc` instead.
 
 ---
 
