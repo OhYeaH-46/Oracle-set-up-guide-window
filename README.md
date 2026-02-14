@@ -29,6 +29,7 @@ Use this to track your progress:
 - [ ] Step 0: Windows prerequisites
 - [ ] Step 1: Install WSL2 + Ubuntu
 - [ ] Step 2: Update Ubuntu + essentials
+- [ ] Step 2.5: Check your shell (bash or zsh)
 - [ ] Step 3: Configure Git
 - [ ] Step 4: Install GitHub CLI + login
 - [ ] Step 5: Install Bun
@@ -146,16 +147,22 @@ sudo apt install -y build-essential curl wget unzip zip git \
 
 > `sudo` will ask for the password you set in Step 1.
 
-### Check your shell
+---
+
+## Step 2.5: Check Your Shell
+
+> **This step is important!** Your shell determines which config file to use.
+> Getting this wrong will cause errors later.
 
 ```bash
 echo $SHELL
 ```
 
-- If it shows `/bin/bash` → you're on **bash** (default)
-- If it shows `/bin/zsh` or `/usr/bin/zsh` → you're on **zsh**
+**Result A** — `/bin/bash` → You're on **bash**. Follow the **bash** commands below.
 
-> **Important:** The rest of this guide uses `source ~/.bashrc` for bash users. If you're on **zsh**, replace with `source ~/.zshrc` everywhere. See the [Bash vs Zsh](#bash-vs-zsh) section for details.
+**Result B** — `/bin/zsh` or `/usr/bin/zsh` → You're on **zsh**. Follow the **zsh** commands below.
+
+> **WARNING:** Never run `source ~/.bashrc` if you're on zsh. It will cause `shopt: command not found` errors. Always use the command for YOUR shell only.
 
 ---
 
@@ -221,13 +228,17 @@ Should show: `Logged in to github.com`
 curl -fsSL https://bun.sh/install | bash
 ```
 
-**Reload shell** (important!):
+**Reload shell — pick ONE for your shell:**
+
+If you're on **bash**:
 
 ```bash
-# bash users:
 source ~/.bashrc
+```
 
-# zsh users:
+If you're on **zsh**:
+
+```bash
 source ~/.zshrc
 ```
 
@@ -236,6 +247,14 @@ Verify:
 ```bash
 bun --version
 ```
+
+> **zsh users:** If bun is not found, the installer added config to `.bashrc` instead of `.zshrc`. Fix it:
+> ```bash
+> grep -E 'bun|BUN' ~/.bashrc >> ~/.zshrc
+> ```
+> ```bash
+> source ~/.zshrc
+> ```
 
 ---
 
@@ -247,15 +266,31 @@ We use **fnm** (Fast Node Manager) — faster than nvm:
 curl -fsSL https://fnm.vercel.app/install | bash
 ```
 
-**Reload shell:**
+**Reload shell — pick ONE for your shell:**
+
+If you're on **bash**:
 
 ```bash
-# bash users:
 source ~/.bashrc
+```
 
-# zsh users:
+If you're on **zsh**:
+
+```bash
 source ~/.zshrc
 ```
+
+> **zsh users:** If fnm is not found, fix it:
+> ```bash
+> grep -E 'fnm|FNM' ~/.bashrc >> ~/.zshrc
+> ```
+> Then add fnm eval to `.zshrc`:
+> ```bash
+> echo 'eval "$(fnm env --use-on-cd --shell zsh)"' >> ~/.zshrc
+> ```
+> ```bash
+> source ~/.zshrc
+> ```
 
 Install Node.js 22 (LTS):
 
@@ -271,6 +306,9 @@ Verify:
 
 ```bash
 node --version
+```
+
+```bash
 npm --version
 ```
 
@@ -352,11 +390,17 @@ cd YOUR_ORACLE_REPO
 
 ```bash
 mkdir -p ~/ghq/github.com/YOUR_GITHUB_USERNAME
+```
+
+```bash
 cd ~/ghq/github.com/YOUR_GITHUB_USERNAME
 ```
 
 ```bash
 gh repo create my-oracle --private --clone
+```
+
+```bash
 cd my-oracle
 ```
 
@@ -388,16 +432,9 @@ tmux lets your Oracle keep running even when you close the terminal.
 
 ```bash
 cat >> ~/.tmux.conf << 'EOF'
-# Mouse support
 set -g mouse on
-
-# Scrollback history
 set -g history-limit 50000
-
-# Colors
 set -g default-terminal "screen-256color"
-
-# Status bar
 set -g status-style 'bg=#333333 fg=#ffffff'
 set -g status-left ' Oracle '
 set -g status-right ' %H:%M '
@@ -454,6 +491,7 @@ echo "==============================="
 echo "  Oracle WSL2 Health Check"
 echo "==============================="
 echo ""
+echo "  Shell:   $SHELL"
 echo "  Git:     $(git --version 2>/dev/null || echo 'NOT INSTALLED')"
 echo "  gh:      $(gh --version 2>/dev/null | head -1 || echo 'NOT INSTALLED')"
 echo "  Bun:     $(bun --version 2>/dev/null || echo 'NOT INSTALLED')"
@@ -484,6 +522,9 @@ tmux new-session -s oracle
 
 ```bash
 cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/YOUR_ORACLE_REPO
+```
+
+```bash
 claude
 ```
 
@@ -512,16 +553,18 @@ The awakening ritual (~15 min) will guide you through:
 ### Daily Usage
 
 ```bash
-# Open Ubuntu
 wsl
+```
 
-# Start Oracle (or reattach)
+```bash
 tmux attach -t oracle || tmux new-session -s oracle
+```
 
-# Navigate to repo
+```bash
 cd ~/ghq/github.com/YOUR_USERNAME/YOUR_ORACLE
+```
 
-# Run Claude
+```bash
 claude
 ```
 
@@ -594,17 +637,27 @@ Paste your token when prompted.
 
 ### "command not found" after installing bun/node/fnm
 
-Reload your shell:
+**If you're on bash:**
 
 ```bash
-# bash users:
 source ~/.bashrc
+```
 
-# zsh users:
+**If you're on zsh:**
+
+```bash
 source ~/.zshrc
 ```
 
-Or close and reopen Ubuntu terminal.
+If still not found, the installer may have added config to the wrong file. Copy it over:
+
+```bash
+grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
+```
+
+```bash
+source ~/.zshrc
+```
 
 ### Accessing Windows files from WSL
 
@@ -620,8 +673,17 @@ WSL sessions don't survive Windows restarts. After restarting Windows:
 
 ```bash
 wsl
+```
+
+```bash
 tmux new-session -s oracle
+```
+
+```bash
 cd ~/ghq/github.com/YOUR_USERNAME/YOUR_ORACLE
+```
+
+```bash
 claude
 ```
 
@@ -633,21 +695,97 @@ If you get `EACCES` errors:
 
 ```bash
 mkdir -p ~/.npm-global
+```
+
+```bash
 npm config set prefix '~/.npm-global'
 ```
 
-```bash
-# bash users:
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
+**If you're on bash:**
 
-# zsh users:
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
-source ~/.zshrc
+```bash
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 ```
 
 ```bash
+source ~/.bashrc
+```
+
+**If you're on zsh:**
+
+```bash
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
+```
+
+```bash
+source ~/.zshrc
+```
+
+Then retry:
+
+```bash
 npm install -g @anthropic-ai/claude-code
+```
+
+---
+
+## Bash vs Zsh
+
+Ubuntu defaults to **bash**, but some setups use **zsh** instead (e.g., Oh My Zsh). Both work fine — just **never mix them**.
+
+### The Golden Rule
+
+> **Only source the config file for YOUR shell. Never source the other one.**
+
+| Your Shell | Use This | NEVER Use This |
+|------------|----------|----------------|
+| bash | `source ~/.bashrc` | ~~`source ~/.zshrc`~~ |
+| zsh | `source ~/.zshrc` | ~~`source ~/.bashrc`~~ |
+
+### Check which shell you're on
+
+```bash
+echo $SHELL
+```
+
+### Config files
+
+| | Bash | Zsh |
+|---|------|-----|
+| Config file | `~/.bashrc` | `~/.zshrc` |
+| Reload | `source ~/.bashrc` | `source ~/.zshrc` |
+| Switch to it | `chsh -s /bin/bash` | `chsh -s $(which zsh)` |
+
+### Common error: `shopt: command not found`
+
+```
+/home/user/.bashrc:16: command not found: shopt
+```
+
+This means you ran `source ~/.bashrc` while on zsh. `shopt` is a bash-only command.
+
+**Fix:** Don't run `source ~/.bashrc`. Use `source ~/.zshrc` instead.
+
+### Tools installed to wrong config file
+
+Some installers (bun, fnm) auto-add config to `~/.bashrc`. If you're on zsh, those lines won't load.
+
+**Fix:** Copy the config lines to your zsh config:
+
+```bash
+grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
+```
+
+Then for fnm specifically, also add:
+
+```bash
+echo 'eval "$(fnm env --use-on-cd --shell zsh)"' >> ~/.zshrc
+```
+
+Then reload:
+
+```bash
+source ~/.zshrc
 ```
 
 ---
@@ -701,40 +839,6 @@ Same result, different installer. No extra layer needed.
 │  └──────────┘  └──────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
-
----
-
-## Bash vs Zsh
-
-Ubuntu defaults to **bash**, but some setups use **zsh** instead. Both work fine — just use the right config file.
-
-| | Bash | Zsh |
-|---|------|-----|
-| Config file | `~/.bashrc` | `~/.zshrc` |
-| Reload | `source ~/.bashrc` | `source ~/.zshrc` |
-| Check which | `echo $SHELL` | `echo $SHELL` |
-| Switch to bash | `chsh -s /bin/bash` | — |
-| Switch to zsh | — | `chsh -s $(which zsh)` |
-
-### If you installed tools with bash but switched to zsh
-
-Some installers (bun, fnm) add config lines to `~/.bashrc`. If you're on zsh, those lines won't load. Fix it:
-
-```bash
-# Copy bun/fnm config from bashrc to zshrc
-grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
-source ~/.zshrc
-```
-
-### Common zsh error: `shopt: command not found`
-
-If you see this error:
-
-```
-/home/user/.bashrc:16: command not found: shopt
-```
-
-It means zsh is trying to source `.bashrc` which contains bash-only commands. **Don't source `.bashrc` from zsh.** Use `source ~/.zshrc` instead.
 
 ---
 
