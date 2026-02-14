@@ -667,6 +667,21 @@ You should see folders like: `awaken`, `birth`, `recap`, `standup`, `trace`, `rr
 
 > **Note:** Skills are installed globally at `~/.claude/skills/`. All Oracles on your machine share them — you only need to install once.
 
+### Important: Restart Claude Code after installing skills
+
+If Claude Code was already running before you installed skills, **you must exit and restart it**.
+Skills are loaded when Claude Code starts. If you installed skills while Claude was open, it won't see them.
+
+```
+# Inside Claude Code:
+/exit
+
+# Then start Claude again:
+claude
+```
+
+> **How to check:** Type `/` in Claude Code. You should see skills like `/awaken`, `/recap`, `/rrr` in the list. If you only see built-in commands (`/help`, `/model`, `/compact`), restart Claude Code.
+
 ---
 
 ## Step 12: Awaken Your Oracle
@@ -919,6 +934,8 @@ echo ""
 
 ### Daily Usage — Start Your Oracle
 
+### Start a tmux session
+
 ```bash
 wsl                                              # Open Ubuntu
 tmux attach -t oracle || tmux new-session -s oracle  # Resume or start tmux
@@ -1093,6 +1110,36 @@ claude
 ```
 
 Then type `/recap` to reorient.
+
+### Skills not showing when typing `/`
+
+**Symptom:** You type `/` in Claude Code but only see built-in commands (`/help`, `/model`), not Oracle skills (`/awaken`, `/recap`).
+
+**Cause:** Claude Code loads skills when it starts. If you installed skills while Claude was already running, it doesn't know about them.
+
+**Fix:**
+
+```
+/exit
+```
+
+Then restart:
+
+```bash
+claude
+```
+
+Type `/` again — skills should appear now.
+
+**Still not showing?** Check the debug log:
+
+```bash
+cat ~/.claude/debug/latest | grep "Loaded.*unique skills"
+```
+
+Should show: `Loaded 27 unique skills (user: 26, ...)`. If user = 0, skills aren't installed — re-run Step 11.
+
+---
 
 ### npm permission errors (EACCES)
 
