@@ -859,8 +859,17 @@ cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
 
 ```bash
-claude
+claude --dangerously-skip-permissions
 ```
+
+> **What is `--dangerously-skip-permissions`?** Normally, Claude Code asks for your permission every time it wants to run a command, create a file, or access the internet. During awakening, it runs hundreds of these actions (cloning repos, creating folders, writing files, making git commits). Without this flag, you'd have to press "approve" every few seconds for 20 minutes.
+>
+> This flag tells Claude Code: "I trust you — go ahead without asking." It's safe here because:
+> - You're in a brand new, empty repo (nothing to break)
+> - The awakening only creates files inside this repo
+> - You can review everything after it's done (`git log`, `ls ψ/`)
+>
+> **After awakening**, you can start Claude normally (without the flag) and it will ask for permissions as usual.
 
 ### Run the awakening
 
