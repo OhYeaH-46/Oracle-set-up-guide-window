@@ -3,6 +3,8 @@
 > Set up Claude Code + Oracle on a brand new PC — from zero to running.
 >
 > Copy-paste each step. Total time: ~30 minutes.
+>
+> This guide uses **zsh** (with Oh My Zsh) as the default shell.
 
 ---
 
@@ -11,6 +13,7 @@
 | Tool | What It Does |
 |------|-------------|
 | **WSL2 + Ubuntu** | Linux environment inside Windows |
+| **zsh + Oh My Zsh** | Modern shell with autocomplete and themes |
 | **Claude Code** | AI coding assistant (CLI) |
 | **Oracle Skills** | 60+ productivity skills for Claude Code |
 | **tmux** | Always-on sessions (close terminal, AI keeps running) |
@@ -24,24 +27,22 @@
 
 ## Checklist
 
-Use this to track your progress:
-
 - [ ] Step 0: Windows prerequisites
 - [ ] Step 1: Install WSL2 + Ubuntu
 - [ ] Step 2: Update Ubuntu + essentials
-- [ ] Step 2.5: Check your shell (bash or zsh)
-- [ ] Step 3: Configure Git
-- [ ] Step 4: Install GitHub CLI + login
-- [ ] Step 5: Install Bun
-- [ ] Step 6: Install Node.js
-- [ ] Step 7: Install Python 3
-- [ ] Step 8: Install Claude Code + login
-- [ ] Step 9: Clone Oracle repo
-- [ ] Step 10: Install Oracle Skills
-- [ ] Step 11: Setup tmux (always-on)
-- [ ] Step 12: VS Code integration
-- [ ] Step 13: Verify everything
-- [ ] Step 14: First run!
+- [ ] Step 3: Install zsh + Oh My Zsh
+- [ ] Step 4: Configure Git
+- [ ] Step 5: Install GitHub CLI + login
+- [ ] Step 6: Install Bun
+- [ ] Step 7: Install Node.js
+- [ ] Step 8: Install Python 3
+- [ ] Step 9: Install Claude Code + login
+- [ ] Step 10: Clone Oracle repo
+- [ ] Step 11: Install Oracle Skills
+- [ ] Step 12: Setup tmux (always-on)
+- [ ] Step 13: VS Code integration
+- [ ] Step 14: Verify everything
+- [ ] Step 15: First run!
 
 ---
 
@@ -133,7 +134,7 @@ From now on, open Ubuntu by:
 
 ## Step 2: Update Ubuntu + Install Essentials
 
-**Run in Ubuntu terminal:**
+**All commands from here are run in Ubuntu terminal.**
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -149,26 +150,46 @@ sudo apt install -y build-essential curl wget unzip zip git \
 
 ---
 
-## Step 2.5: Check Your Shell
+## Step 3: Install zsh + Oh My Zsh
 
-> **This step is important!** Your shell determines which config file to use.
-> Getting this wrong will cause errors later.
+### 3.1 — Install Oh My Zsh
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+When it asks "Do you want to change your default shell to zsh?" → type `y`
+
+### 3.2 — Verify
 
 ```bash
 echo $SHELL
 ```
 
-**Result A** — `/bin/bash` → You're on **bash**. Follow the **bash** commands below.
+Should show `/usr/bin/zsh` or `/bin/zsh`.
 
-**Result B** — `/bin/zsh` or `/usr/bin/zsh` → You're on **zsh**. Follow the **zsh** commands below.
+If not, set it manually:
 
-> **WARNING:** Never run `source ~/.bashrc` if you're on zsh. It will cause `shopt: command not found` errors. Always use the command for YOUR shell only.
+```bash
+chsh -s $(which zsh)
+```
+
+Then close and reopen your terminal.
+
+### 3.3 — Why zsh?
+
+- Better autocomplete than bash
+- Oh My Zsh themes and plugins
+- Same shell as macOS default
+- Everything in this guide is tested on zsh
+
+> **Important:** From now on, all config goes to `~/.zshrc`.
+> Never run `source ~/.bashrc` — it will cause errors.
+> Always use `source ~/.zshrc`.
 
 ---
 
-## Step 3: Configure Git
-
-Replace with your own GitHub username and email:
+## Step 4: Configure Git
 
 ```bash
 git config --global user.name "YOUR_GITHUB_USERNAME"
@@ -184,9 +205,9 @@ git config --global init.defaultBranch master
 
 ---
 
-## Step 4: Install GitHub CLI (gh)
+## Step 5: Install GitHub CLI (gh)
 
-### 4.1 — Install
+### 5.1 — Install
 
 ```bash
 (type -p wget >/dev/null || sudo apt-get install wget -y) \
@@ -199,7 +220,7 @@ git config --global init.defaultBranch master
   && sudo apt install gh -y
 ```
 
-### 4.2 — Login
+### 5.2 — Login
 
 ```bash
 gh auth login
@@ -212,7 +233,7 @@ Follow the prompts:
 4. Copy the one-time code shown in terminal
 5. Press Enter → browser opens → paste code → authorize
 
-### 4.3 — Verify
+### 5.3 — Verify
 
 ```bash
 gh auth status
@@ -222,21 +243,17 @@ Should show: `Logged in to github.com`
 
 ---
 
-## Step 5: Install Bun
+## Step 6: Install Bun
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-**Reload shell — pick ONE for your shell:**
-
-If you're on **bash**:
+The installer adds config to `~/.bashrc` by default. We need it in `~/.zshrc`:
 
 ```bash
-source ~/.bashrc
+grep -E 'bun|BUN' ~/.bashrc >> ~/.zshrc
 ```
-
-If you're on **zsh**:
 
 ```bash
 source ~/.zshrc
@@ -248,17 +265,9 @@ Verify:
 bun --version
 ```
 
-> **zsh users:** If bun is not found, the installer added config to `.bashrc` instead of `.zshrc`. Fix it:
-> ```bash
-> grep -E 'bun|BUN' ~/.bashrc >> ~/.zshrc
-> ```
-> ```bash
-> source ~/.zshrc
-> ```
-
 ---
 
-## Step 6: Install Node.js
+## Step 7: Install Node.js
 
 We use **fnm** (Fast Node Manager) — faster than nvm:
 
@@ -266,31 +275,19 @@ We use **fnm** (Fast Node Manager) — faster than nvm:
 curl -fsSL https://fnm.vercel.app/install | bash
 ```
 
-**Reload shell — pick ONE for your shell:**
-
-If you're on **bash**:
+The installer adds config to `~/.bashrc`. Copy it to `~/.zshrc` and add zsh support:
 
 ```bash
-source ~/.bashrc
+grep -E 'fnm|FNM' ~/.bashrc >> ~/.zshrc
 ```
 
-If you're on **zsh**:
+```bash
+echo 'eval "$(fnm env --use-on-cd --shell zsh)"' >> ~/.zshrc
+```
 
 ```bash
 source ~/.zshrc
 ```
-
-> **zsh users:** If fnm is not found, fix it:
-> ```bash
-> grep -E 'fnm|FNM' ~/.bashrc >> ~/.zshrc
-> ```
-> Then add fnm eval to `.zshrc`:
-> ```bash
-> echo 'eval "$(fnm env --use-on-cd --shell zsh)"' >> ~/.zshrc
-> ```
-> ```bash
-> source ~/.zshrc
-> ```
 
 Install Node.js 22 (LTS):
 
@@ -314,7 +311,7 @@ npm --version
 
 ---
 
-## Step 7: Install Python 3
+## Step 8: Install Python 3
 
 Usually pre-installed on Ubuntu 24.04. Check:
 
@@ -330,21 +327,21 @@ sudo apt install -y python3 python3-pip python3-venv
 
 ---
 
-## Step 8: Install Claude Code
+## Step 9: Install Claude Code
 
-### 8.1 — Install
+### 9.1 — Install
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-### 8.2 — Verify
+### 9.2 — Verify
 
 ```bash
 claude --version
 ```
 
-### 8.3 — Login
+### 9.3 — Login
 
 ```bash
 claude
@@ -364,7 +361,7 @@ After login, type `/exit` to quit Claude for now.
 
 ---
 
-## Step 9: Clone Your Oracle Repo
+## Step 10: Clone Your Oracle Repo
 
 ### If you already have an Oracle repo:
 
@@ -404,11 +401,11 @@ gh repo create my-oracle --private --clone
 cd my-oracle
 ```
 
-Then later in Step 14 you'll use `/awaken` to create your Oracle identity.
+Then later in Step 15 you'll use `/awaken` to create your Oracle identity.
 
 ---
 
-## Step 10: Install Oracle Skills
+## Step 11: Install Oracle Skills
 
 ```bash
 ~/.bun/bin/bunx --bun oracle-skills@github:Soul-Brews-Studio/oracle-skills-cli install -g -y
@@ -424,11 +421,11 @@ You should see folders like: `recap`, `standup`, `trace`, `rrr`, `forward`, `fee
 
 ---
 
-## Step 11: Setup tmux (Always-On Sessions)
+## Step 12: Setup tmux (Always-On Sessions)
 
 tmux lets your Oracle keep running even when you close the terminal.
 
-### 11.1 — Create tmux config
+### 12.1 — Create tmux config
 
 ```bash
 cat >> ~/.tmux.conf << 'EOF'
@@ -441,7 +438,7 @@ set -g status-right ' %H:%M '
 EOF
 ```
 
-### 11.2 — tmux Cheat Sheet
+### 12.2 — tmux Cheat Sheet
 
 | Action | How |
 |--------|-----|
@@ -452,7 +449,7 @@ EOF
 | **Kill session** | `tmux kill-session -t oracle` |
 | **Scroll up** | `Ctrl+B` then `[` then arrow keys, `q` to exit |
 
-### 11.3 — How it works
+### 12.3 — How it works
 
 ```
 You start Claude in tmux:
@@ -467,7 +464,7 @@ You come back later:
 
 ---
 
-## Step 12: VS Code Integration
+## Step 13: VS Code Integration
 
 From Ubuntu terminal, open your Oracle repo:
 
@@ -477,13 +474,11 @@ code ~/ghq/github.com/YOUR_GITHUB_USERNAME/YOUR_ORACLE_REPO
 
 - VS Code will auto-install the **WSL extension**
 - You're now editing files directly on the Linux filesystem
-- Terminal in VS Code = Ubuntu terminal
+- Terminal in VS Code = Ubuntu terminal (zsh)
 
 ---
 
-## Step 13: Verify Everything
-
-Run this health check script:
+## Step 14: Verify Everything
 
 ```bash
 echo ""
@@ -506,15 +501,11 @@ echo "==============================="
 echo ""
 ```
 
-**Expected output:** All items show a version number, skills > 20.
-
-If anything shows `NOT INSTALLED`, go back to that step.
+**Expected:** All items show a version, Shell = zsh, Skills > 20.
 
 ---
 
-## Step 14: First Run!
-
-### Start your Oracle:
+## Step 15: First Run!
 
 ```bash
 tmux new-session -s oracle
@@ -601,8 +592,6 @@ Inside Claude Code:
 
 ### WSL2 is slow
 
-Check it's version 2:
-
 ```powershell
 wsl --list --verbose
 ```
@@ -615,15 +604,11 @@ wsl --set-version Ubuntu-24.04 2
 
 ### Claude Code login doesn't open browser
 
-Use device code method:
-
 ```bash
 claude login --method device-code
 ```
 
 ### gh auth not working
-
-Use a personal access token:
 
 1. Go to https://github.com/settings/tokens
 2. Generate new token (classic) with `repo` scope
@@ -633,27 +618,27 @@ Use a personal access token:
 gh auth login --with-token
 ```
 
-Paste your token when prompted.
-
 ### "command not found" after installing bun/node/fnm
-
-**If you're on bash:**
-
-```bash
-source ~/.bashrc
-```
-
-**If you're on zsh:**
 
 ```bash
 source ~/.zshrc
 ```
 
-If still not found, the installer may have added config to the wrong file. Copy it over:
+If still not found, copy config from bashrc:
 
 ```bash
 grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
 ```
+
+```bash
+source ~/.zshrc
+```
+
+### `shopt: command not found`
+
+You accidentally ran `source ~/.bashrc` in zsh. `shopt` is bash-only.
+
+**Fix:** Just don't run it. Use this instead:
 
 ```bash
 source ~/.zshrc
@@ -665,11 +650,11 @@ source ~/.zshrc
 ls /mnt/c/Users/YourWindowsUsername/
 ```
 
-> **Important:** Files on `/mnt/c/` are slower. Always keep your Oracle repo on the Linux filesystem (`~/`) for best performance.
+> **Important:** Files on `/mnt/c/` are slower. Always keep your Oracle repo on the Linux filesystem (`~/`).
 
 ### tmux session gone after Windows restart
 
-WSL sessions don't survive Windows restarts. After restarting Windows:
+WSL sessions don't survive Windows restarts. After restarting:
 
 ```bash
 wsl
@@ -689,9 +674,7 @@ claude
 
 Then `/recap` to reorient.
 
-### npm permission errors
-
-If you get `EACCES` errors:
+### npm permission errors (EACCES)
 
 ```bash
 mkdir -p ~/.npm-global
@@ -701,18 +684,6 @@ mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
 ```
 
-**If you're on bash:**
-
-```bash
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-```
-
-```bash
-source ~/.bashrc
-```
-
-**If you're on zsh:**
-
 ```bash
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
 ```
@@ -721,78 +692,15 @@ echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Then retry:
-
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
 ---
 
-## Bash vs Zsh
-
-Ubuntu defaults to **bash**, but some setups use **zsh** instead (e.g., Oh My Zsh). Both work fine — just **never mix them**.
-
-### The Golden Rule
-
-> **Only source the config file for YOUR shell. Never source the other one.**
-
-| Your Shell | Use This | NEVER Use This |
-|------------|----------|----------------|
-| bash | `source ~/.bashrc` | ~~`source ~/.zshrc`~~ |
-| zsh | `source ~/.zshrc` | ~~`source ~/.bashrc`~~ |
-
-### Check which shell you're on
-
-```bash
-echo $SHELL
-```
-
-### Config files
-
-| | Bash | Zsh |
-|---|------|-----|
-| Config file | `~/.bashrc` | `~/.zshrc` |
-| Reload | `source ~/.bashrc` | `source ~/.zshrc` |
-| Switch to it | `chsh -s /bin/bash` | `chsh -s $(which zsh)` |
-
-### Common error: `shopt: command not found`
-
-```
-/home/user/.bashrc:16: command not found: shopt
-```
-
-This means you ran `source ~/.bashrc` while on zsh. `shopt` is a bash-only command.
-
-**Fix:** Don't run `source ~/.bashrc`. Use `source ~/.zshrc` instead.
-
-### Tools installed to wrong config file
-
-Some installers (bun, fnm) auto-add config to `~/.bashrc`. If you're on zsh, those lines won't load.
-
-**Fix:** Copy the config lines to your zsh config:
-
-```bash
-grep -E 'bun|fnm|BUN|FNM' ~/.bashrc >> ~/.zshrc
-```
-
-Then for fnm specifically, also add:
-
-```bash
-echo 'eval "$(fnm env --use-on-cd --shell zsh)"' >> ~/.zshrc
-```
-
-Then reload:
-
-```bash
-source ~/.zshrc
-```
-
----
-
 ## Do I need Homebrew?
 
-**No.** Ubuntu has `apt` which is faster and more native. Everything in this guide installs directly without Homebrew.
+**No.** Ubuntu has `apt` which is faster and more native. Everything in this guide installs without Homebrew.
 
 | Tool | Mac uses | Ubuntu uses |
 |------|----------|-------------|
@@ -802,11 +710,9 @@ source ~/.zshrc
 | Git | `brew install git` | `apt install git` |
 | gh | `brew install gh` | `apt install gh` |
 
-Same result, different installer. No extra layer needed.
-
 ---
 
-## Why WSL2 instead of native Windows?
+## Why WSL2?
 
 | Feature | Windows | WSL2 Ubuntu |
 |---------|---------|-------------|
@@ -815,8 +721,8 @@ Same result, different installer. No extra layer needed.
 | Linux compatibility | Limited | Full |
 | VS Code support | Native | Via Remote-WSL |
 | File system | NTFS (slower) | ext4 (fast) |
-| Shell scripting | Limited | Full bash/zsh |
-| Docker | Docker Desktop | Native Docker |
+| Shell | PowerShell | zsh (modern) |
+| Docker | Docker Desktop | Native |
 
 ---
 
@@ -829,13 +735,13 @@ Same result, different installer. No extra layer needed.
 │  ┌──────────┐  ┌──────────────────────┐ │
 │  │ VS Code  │  │     WSL2 Ubuntu      │ │
 │  │          ├──┤                      │ │
-│  │ (editor) │  │  tmux ─── claude     │ │
-│  │          │  │    │                 │ │
-│  └──────────┘  │    └── Oracle repo   │ │
-│                │        ├── CLAUDE.md │ │
-│  ┌──────────┐  │        ├── skills/   │ │
-│  │ Browser  │  │        └── memory/   │ │
-│  │ (GitHub) │  │                      │ │
+│  │ (editor) │  │  zsh + Oh My Zsh    │ │
+│  │          │  │  tmux ─── claude     │ │
+│  └──────────┘  │    │                 │ │
+│                │    └── Oracle repo   │ │
+│  ┌──────────┐  │        ├── CLAUDE.md │ │
+│  │ Browser  │  │        ├── skills/   │ │
+│  │ (GitHub) │  │        └── memory/   │ │
 │  └──────────┘  └──────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
@@ -847,6 +753,7 @@ Same result, different installer. No extra layer needed.
 - [Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code)
 - [Oracle Skills CLI](https://github.com/Soul-Brews-Studio/oracle-skills-cli)
 - [Oracle Philosophy](https://github.com/Soul-Brews-Studio/oracle-v2)
+- [Oh My Zsh](https://ohmyz.sh/)
 - [WSL Documentation](https://learn.microsoft.com/en-us/windows/wsl/)
 - [tmux Cheat Sheet](https://tmuxcheatsheet.com/)
 - [Windows Terminal](https://aka.ms/terminal)
