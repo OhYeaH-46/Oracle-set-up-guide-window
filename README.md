@@ -746,20 +746,17 @@ You should see folders like: `awaken`, `birth`, `recap`, `standup`, `trace`, `rr
 
 > **Note:** Skills are installed globally at `~/.claude/skills/`. All Oracles on your machine share them — you only need to install once.
 
-### Important: Restart Claude Code after installing skills
+### Important: Do NOT start Claude Code yet
 
-If Claude Code was already running before you installed skills, **you must exit and restart it**.
-Skills are loaded when Claude Code starts. If you installed skills while Claude was open, it won't see them.
+If Claude Code is currently running, **exit it now**:
 
 ```
-# Inside Claude Code:
 /exit
-
-# Then start Claude again:
-claude
 ```
 
-> **How to check:** Type `/` in Claude Code. You should see skills like `/awaken`, `/recap`, `/rrr` in the list. If you only see built-in commands (`/help`, `/model`, `/compact`), restart Claude Code.
+Skills are loaded when Claude Code starts. We'll start a fresh session in Step 14 with the right settings. If you start Claude before then, it may not load the skills correctly.
+
+> **Why wait?** We need to verify a few things first (Step 13), then start Claude in a special mode for the awakening (Step 14). Starting Claude now would mean exiting and restarting it again later.
 
 ---
 
@@ -769,13 +766,21 @@ claude
 
 Run through this checklist before starting `/awaken`:
 
-### 13.1 — Verify you're in the Oracle repo
+### 13.1 — Make sure you're in the Oracle repo
+
+After exiting Claude Code, your terminal may have returned to your home directory. Go back to the Oracle repo:
+
+```bash
+cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
+```
+
+Verify:
 
 ```bash
 pwd
 ```
 
-Should show your Oracle repo path (e.g., `~/ghq/github.com/YOUR_USERNAME/my-oracle`).
+Should show your Oracle repo path (e.g., `/home/yourname/ghq/github.com/YOUR_USERNAME/my-oracle`).
 
 ```bash
 git status
@@ -801,32 +806,19 @@ ghq --version
 
 Should show a version number. ghq is used by `/learn` and `/trace` to clone ancestor repos.
 
-### 13.4 — Verify skills are loaded in Claude Code
-
-Start a **fresh** Claude Code session:
+### 13.4 — Verify skills are installed
 
 ```bash
-claude
+ls ~/.claude/skills/ | wc -l
 ```
 
-Inside Claude Code, type `/` (just the slash character). You should see a list of skills including:
-- `/awaken`
-- `/trace`
-- `/learn`
-- `/recap`
-- `/rrr`
-
-> **If you don't see skills:** Type `/exit`, then run `claude` again. Skills are only loaded at startup. See [Troubleshooting: Skills not showing](#skills-not-showing-when-typing-) for details.
-
-### 13.5 — Verify with debug log (optional)
-
-If you want to double-check, exit Claude Code and check the debug log:
+Should show 20 or more. If it shows 0, go back to Step 12 and reinstall.
 
 ```bash
-cat ~/.claude/debug/latest | grep "Loaded.*unique skills"
+ls ~/.claude/skills/awaken/SKILL.md
 ```
 
-Should show something like: `Loaded 27 unique skills (user: 26, ...)`. The "user" count should be 20+.
+Should show the file path (no error). This confirms the `/awaken` skill is ready.
 
 ### Pre-flight Checklist
 
@@ -835,7 +827,7 @@ Should show something like: `Loaded 27 unique skills (user: 26, ...)`. The "user
 | 1 | In Oracle repo | `pwd` | Your Oracle repo path |
 | 2 | GitHub access | `gh auth status` | Logged in |
 | 3 | ghq installed | `ghq --version` | Version number |
-| 4 | Skills loaded | Type `/` in Claude Code | See `/awaken` in list |
+| 4 | Skills installed | `ls ~/.claude/skills/ \| wc -l` | 20+ |
 
 All 4 checks pass? You're ready for awakening!
 
@@ -852,11 +844,15 @@ All 4 checks pass? You're ready for awakening!
 >
 > **Your role:** Answer the questions it asks — your Oracle's name, your name, its purpose. The rest happens automatically.
 
-### Start Claude Code in your Oracle repo
+### Start Claude Code
+
+You should already be in your Oracle repo (from Step 13.1). If not:
 
 ```bash
 cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
+
+Start Claude Code with permissions bypassed:
 
 ```bash
 claude --dangerously-skip-permissions
@@ -874,6 +870,8 @@ claude --dangerously-skip-permissions
 ### Run the awakening
 
 After running `claude --dangerously-skip-permissions`, you'll see Claude Code's input prompt — a text area where you can type messages. This is where you talk to Claude.
+
+**Quick check:** Type `/` (just the slash). You should see `/awaken` in the list. If you don't, see [Troubleshooting: Skills not showing](#skills-not-showing-when-typing-).
 
 Type this and press Enter:
 
