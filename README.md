@@ -503,33 +503,18 @@ sudo apt install -y python3 python3-pip python3-venv
 
 ### 9.1 — Install ghq
 
-**Option A: Using Go (if you have it):**
+Copy and paste this block — it downloads the latest ghq and installs it:
 
 ```bash
-go install github.com/x-motemen/ghq@latest
+GHQ_VER=$(curl -s https://api.github.com/repos/x-motemen/ghq/releases/latest | jq -r .tag_name) \
+  && curl -sL "https://github.com/x-motemen/ghq/releases/download/${GHQ_VER}/ghq_linux_amd64.zip" -o /tmp/ghq.zip \
+  && unzip -o /tmp/ghq.zip -d /tmp/ghq \
+  && sudo mv /tmp/ghq/ghq_linux_amd64/ghq /usr/local/bin/ \
+  && rm -rf /tmp/ghq /tmp/ghq.zip \
+  && echo "ghq $(ghq --version) installed successfully"
 ```
 
-**Option B: Download binary (no Go required):**
-
-```bash
-GHQ_VER=$(curl -s https://api.github.com/repos/x-motemen/ghq/releases/latest | jq -r .tag_name)
-```
-
-```bash
-curl -sL "https://github.com/x-motemen/ghq/releases/download/${GHQ_VER}/ghq_linux_amd64.zip" -o /tmp/ghq.zip
-```
-
-```bash
-unzip -o /tmp/ghq.zip -d /tmp/ghq
-```
-
-```bash
-sudo mv /tmp/ghq/ghq_linux_amd64/ghq /usr/local/bin/
-```
-
-```bash
-rm -rf /tmp/ghq /tmp/ghq.zip
-```
+> This downloads ghq from GitHub, extracts it, and puts it in a system folder. All tools used here (`curl`, `jq`, `unzip`) were installed in Step 2.
 
 ### 9.2 — Configure ghq root
 
@@ -554,7 +539,7 @@ gq () {
   url=$(echo "$url" | sed 's|/tree/[^/]*$||' | sed 's|/blob/.*$||')
   local repo_path=$(echo "$url" | sed 's|https://github.com/||' | sed 's|git@github.com:||' | sed 's|\.git$||')
   local full_path="$HOME/ghq/github.com/$repo_path"
-  ghq get -u -p "$url" && cd "$full_path"
+  ghq get -u "$url" && cd "$full_path"
 }
 ZSHEOF
 ```
