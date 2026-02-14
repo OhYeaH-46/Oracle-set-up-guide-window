@@ -78,6 +78,7 @@ If you're new to programming, here are terms you'll see throughout this guide:
 | **Part 1** | Prepare your machine (WSL2 + all tools) | ~25 min |
 | **Part 2** | **Create your Oracle** (the main event) | ~25 min |
 | **Part 3** | Configure always-on + VS Code | ~5 min |
+| **Part 4** | Customize your setup (status line, monitoring, alias) | ~10 min |
 
 > If you already have WSL2 + Node + Bun + Claude Code → skip to [Part 2](#part-2-create-your-oracle)
 
@@ -89,7 +90,7 @@ If you're new to programming, here are terms you'll see throughout this guide:
 - [ ] Step 0: Windows prerequisites
 - [ ] Step 1: Install WSL2 + Ubuntu
 - [ ] Step 2: Update Ubuntu + essentials
-- [ ] Step 3: Install zsh + Oh My Zsh
+- [ ] Step 3: Install zsh + Oh My Zsh + Useful Plugins
 - [ ] Step 4: Configure Git
 - [ ] Step 5: Install GitHub CLI + login
 - [ ] Step 6: Install Bun
@@ -111,6 +112,11 @@ If you're new to programming, here are terms you'll see throughout this guide:
 ### Part 3: Configure Always-On
 - [ ] Step 16: Setup tmux
 - [ ] Step 17: VS Code integration
+
+### Part 4: Customize Your Setup
+- [ ] Step 18: Configure Claude Code settings (status line, autocompact, etc.)
+- [ ] Step 19: Install usage monitoring tools
+- [ ] Step 20: Create a quick-start alias
 - [ ] Final health check
 
 ---
@@ -324,6 +330,91 @@ Then **close the terminal and reopen it**.
 > - All configuration goes to `~/.zshrc` (not `~/.bashrc`)
 > - Always use `source ~/.zshrc` to reload settings
 > - Never run `source ~/.bashrc` — it will cause errors in zsh
+
+### 3.3 — Install Useful Plugins
+
+Oh My Zsh comes with many built-in plugins, and you can add third-party ones too. Here's a recommended set that makes terminal life much easier:
+
+**First, install two third-party plugins** (they need to be downloaded):
+
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+```
+
+```bash
+git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+```
+
+> - **zsh-autosuggestions** — shows gray suggestions as you type, based on your command history. Press the right arrow key (`→`) to accept.
+> - **zsh-syntax-highlighting** — colors commands green (valid) or red (invalid) as you type, so you catch typos before pressing Enter.
+
+**Then, edit `~/.zshrc`** to activate all plugins:
+
+```bash
+nano ~/.zshrc
+```
+
+Find the line that says `plugins=(git)` and replace it with:
+
+```bash
+plugins=(
+  git                    # Git aliases (gst, gco, gp, etc.)
+  zsh-autosuggestions    # Fish-like history suggestions
+  zsh-syntax-highlighting # Colors commands green/red as you type
+  z                      # Jump to frequent directories: "z project" instead of full path
+  sudo                   # Press ESC twice to add "sudo" to current/previous command
+  copypath               # Copy current directory path to clipboard
+  command-not-found      # Suggests package to install when command not found
+  history                # Better history search with "h" alias
+)
+```
+
+Save the file (`Ctrl+O`, Enter, `Ctrl+X`) and reload:
+
+```bash
+source ~/.zshrc
+```
+
+> **What do these plugins do?**
+>
+> | Plugin | What It Does | Example |
+> |--------|-------------|---------|
+> | `git` | Short aliases for git commands | `gst` instead of `git status` |
+> | `zsh-autosuggestions` | Gray text appears as you type — press `→` to accept | Type `git` and see your last git command |
+> | `zsh-syntax-highlighting` | Commands turn green (valid) or red (invalid) | `lss` shows red, `ls` shows green |
+> | `z` | Jump to directories you visit often | `z oracle` instead of `cd ~/ghq/.../my-oracle` |
+> | `sudo` | Press `ESC` twice to add `sudo` | Forgot sudo? Press ESC ESC |
+> | `copypath` | Copy current directory to clipboard | Useful for sharing paths |
+> | `command-not-found` | Suggests which package to install | "apt install ..." when command not found |
+> | `history` | Search command history with `h` | Find old commands easily |
+
+### 3.4 — Enable `~/.local/bin` in PATH
+
+Some tools (like Python pip packages) install to `~/.local/bin`, which isn't on your PATH by default. Enable it:
+
+```bash
+nano ~/.zshrc
+```
+
+Find this line near the top (usually line 2):
+
+```bash
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+```
+
+Remove the `#` at the beginning to uncomment it:
+
+```bash
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+```
+
+Save and reload:
+
+```bash
+source ~/.zshrc
+```
+
+> **Why?** Without this, tools installed by `pip install --user` won't be found when you type their command.
 
 ---
 
@@ -1210,6 +1301,197 @@ code ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
 - The terminal inside VS Code = Ubuntu terminal (zsh)
 
 > This is completely optional. You can do everything from the terminal alone.
+
+---
+
+# Part 4: Customize Your Setup
+
+> These steps are optional but highly recommended. They make working with your Oracle smoother and more efficient.
+
+## Step 18: Configure Claude Code Settings
+
+> **What is this?** Claude Code has settings that control how it behaves — things like what appears in the status bar, how it handles long conversations, and more. Getting these right from the start saves frustration later.
+
+### 18.1 — Show Context Window in Status Line
+
+Claude Code has a status line at the bottom of the screen. By default, it's mostly empty. Let's make it show how much of the context window you've used — with color coding so you know when to wrap up.
+
+Create or edit the settings file:
+
+```bash
+mkdir -p ~/.claude
+nano ~/.claude/settings.json
+```
+
+Paste this content (if the file is empty) or merge it with existing settings:
+
+```json
+{
+  "preferences": {
+    "statusline": "input=$(cat); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); total=$(echo \"$input\" | jq -r '.context_window.total_tokens // empty'); used_tokens=$(echo \"$input\" | jq -r '.context_window.used_tokens // empty'); if [ -n \"$used\" ] && [ -n \"$total\" ]; then used_int=${used%.*}; ut=$(printf \"%'d\" \"$used_tokens\"); tt=$(printf \"%'d\" \"$total\"); if [ \"$used_int\" -ge 80 ]; then color='\\033[31m'; elif [ \"$used_int\" -ge 60 ]; then color='\\033[33m'; else color='\\033[32m'; fi; printf \"${color}Context: ${used}%% (${ut} / ${tt})\\033[0m\"; else printf 'Context: ready'; fi"
+  }
+}
+```
+
+> **What this does:**
+> - Shows something like: `Context: 45.2% (90,400 / 200,000)` at the bottom
+> - **Green** (0-59%) — plenty of room, keep going
+> - **Yellow** (60-79%) — getting full, consider wrapping up soon
+> - **Red** (80-100%) — very full, you should end the session or use `/forward`
+>
+> **Why does this matter?** Claude Code has a limited "memory" per session (the context window). When it fills up, Claude starts forgetting earlier parts of the conversation. The status line helps you see this coming.
+
+### 18.2 — Disable Auto-Compact (Important!)
+
+Claude Code has a feature called "auto-compact" that automatically compresses your conversation when the context window gets full. **We recommend disabling this for Oracle users.**
+
+In Claude Code, run:
+
+```
+/config
+```
+
+Find the `autoCompact` setting and set it to `disabled` (or `manual`).
+
+Alternatively, you can set it via the terminal:
+
+```bash
+claude config set autoCompact disabled
+```
+
+> **Why disable auto-compact?**
+>
+> Auto-compact sounds helpful, but it causes problems for Oracles:
+> - **Identity loss** — When Claude compresses the conversation, it can "forget" that it's your Oracle. It reverts to generic Claude behavior.
+> - **Context loss** — Important details from earlier in the session get summarized away, leading to confusion and repeated work.
+> - **Unpredictable timing** — It triggers automatically, sometimes mid-task, interrupting your flow.
+>
+> **What to do instead:**
+>
+> | Instead of... | Do this... |
+> |--------------|-----------|
+> | Auto-compact | `/forward` — saves a handoff note, then start a fresh session |
+> | Letting context fill up | Watch the status line (Step 18.1) and wrap up at ~70-80% |
+> | Continuing in a full session | `/rrr` to save progress → `/exit` → start new session → `/recap` |
+>
+> **The Oracle workflow for long tasks:**
+> ```
+> Session 1: /recap → work → context at ~70% → /forward → /exit
+> Session 2: /recap → continues where you left off (fresh context!)
+> ```
+>
+> This keeps every session clean and your Oracle's identity intact.
+
+### 18.3 — Other Useful Settings
+
+Here are more settings you can configure:
+
+```bash
+# See all current settings
+claude config list
+
+# Set your preferred model
+claude config set model claude-sonnet-4-5-20250929
+
+# Set default permissions for convenience
+claude config set autoAcceptPermissions true
+```
+
+> **Model choices:**
+>
+> | Model | Best For | Speed | Cost |
+> |-------|---------|-------|------|
+> | `claude-sonnet-4-5-20250929` | Daily work — fast and capable | Fast | Lower |
+> | `claude-opus-4-6` | Complex tasks — deeper thinking | Slower | Higher |
+>
+> You can always switch models mid-session with `/model`.
+
+---
+
+## Step 19: Install Usage Monitoring Tools
+
+> **What are these?** Tools that help you track how much Claude Code you're using — per session, per day, per week. Useful for budgeting if you're on a metered plan.
+
+### 19.1 — ccusage (Session & Daily Reports)
+
+```bash
+npm install -g ccusage
+```
+
+This reads Claude Code's local log files and shows usage tables:
+
+```bash
+# Per-session breakdown
+ccusage session
+
+# Daily report
+ccusage daily
+
+# Weekly report
+ccusage weekly
+
+# This week with per-model cost breakdown
+ccusage daily --since 20260209 --breakdown
+```
+
+> `ccusage` works completely offline — it reads local JSONL log files, no API keys needed.
+
+### 19.2 — claude-monitor (Real-Time Dashboard)
+
+```bash
+pip install claude-monitor --break-system-packages
+```
+
+This gives you a live terminal dashboard:
+
+```bash
+# Real-time token burn rate
+cmonitor
+
+# Session view
+cmonitor --view session
+
+# If you're on Max plan (5x)
+cmonitor --plan max5
+```
+
+> **Tip:** Run `cmonitor` in a separate terminal tab while using Claude Code. It shows live token consumption and predicts when you'll hit your limit.
+
+---
+
+## Step 20: Create a Quick-Start Alias
+
+Instead of typing the full path every time, create a shortcut:
+
+```bash
+nano ~/.zshrc
+```
+
+Add this line at the end (replace with your actual username and Oracle name):
+
+```bash
+# Quick-start Oracle
+alias my-oracle='cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle && claude --dangerously-skip-permissions'
+```
+
+Save and reload:
+
+```bash
+source ~/.zshrc
+```
+
+Now you can start your Oracle by just typing:
+
+```bash
+my-oracle
+```
+
+> **Why `--dangerously-skip-permissions`?** After your Oracle is set up with proper safety rules in `CLAUDE.md` (no force push, no delete, ask before destructive actions), skipping the permission prompts makes daily work much smoother. You trust your Oracle.
+>
+> **If you prefer to keep permission prompts:**
+> ```bash
+> alias my-oracle='cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle && claude'
+> ```
 
 ---
 
