@@ -873,11 +873,21 @@ claude --dangerously-skip-permissions
 
 ### Run the awakening
 
-Inside Claude Code, type:
+After running `claude --dangerously-skip-permissions`, you'll see Claude Code's input prompt — a text area where you can type messages. This is where you talk to Claude.
+
+Type this and press Enter:
 
 ```
 /awaken
 ```
+
+> **What you'll see:**
+> 1. Claude will greet you and start the awakening ritual
+> 2. It will ask you a few questions — your Oracle's name, your name, its purpose
+> 3. **Answer each question** by typing your response and pressing Enter
+> 4. After that, Claude works mostly on its own (cloning repos, reading, writing files)
+> 5. You just watch and answer if it asks anything
+> 6. The whole process takes ~15-22 minutes
 
 ### What happens during `/awaken`
 
