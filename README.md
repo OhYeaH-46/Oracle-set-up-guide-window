@@ -2,7 +2,7 @@
 
 > Create your own Oracle on a brand new PC — from zero to awakening.
 >
-> Copy-paste each step. Total time: ~50 minutes.
+> Copy-paste each step. Total time: ~60 minutes.
 >
 > No programming experience required. This guide explains every step.
 
@@ -64,6 +64,7 @@ If you're new to programming, here are terms you'll see throughout this guide:
 | **Node.js + npm** | JavaScript runtime + package manager | Required to install Claude Code |
 | **ghq** | Repository organizer | Organizes cloned repos cleanly; used by `/learn` and `/trace` |
 | **Python 3** | Python runtime | Used by some Oracle tools |
+| **wslu** | WSL utilities (wslview) | Opens URLs/files from WSL in Windows browser |
 | **Claude Code** | AI assistant in the terminal | The "brain" that powers your Oracle |
 | **Oracle Skills** | 60+ productivity commands | Gives Claude Code personality, memory, and abilities |
 | **tmux** | Terminal session manager | Keeps Oracle running even when you close the window |
@@ -431,12 +432,27 @@ git config --global user.name "YOUR_GITHUB_USERNAME"
 ```
 
 ```bash
-git config --global user.email "YOUR_EMAIL@example.com"
-```
-
-```bash
 git config --global init.defaultBranch master
 ```
+
+### 4.1 — Set your email (important!)
+
+GitHub has email privacy enabled by default. If you use your real email, `git push` will be **rejected**. Use GitHub's noreply email instead:
+
+1. Go to https://github.com/settings/emails
+2. Find your **noreply email** — it looks like: `12345678+YourUsername@users.noreply.github.com`
+3. Copy it and run:
+
+```bash
+git config --global user.email "12345678+YourUsername@users.noreply.github.com"
+```
+
+> **Why noreply?** GitHub protects your real email from being exposed in public commits. The noreply email works exactly the same for git — it just doesn't reveal your personal email to the world.
+>
+> **If you skip this**, you'll get this error when trying to push:
+> ```
+> remote: error: GH007: Your push would publish a private email address.
+> ```
 
 > These settings are saved permanently. You only need to do this once.
 
@@ -483,6 +499,23 @@ gh auth status
 ```
 
 Should show: `Logged in to github.com as YOUR_USERNAME`
+
+### 5.4 — Install wslu (Open URLs from WSL)
+
+```bash
+sudo apt install -y wslu
+```
+
+Then add the browser setting to zsh:
+
+```bash
+echo 'export BROWSER=wslview' >> ~/.zshrc
+source ~/.zshrc
+```
+
+> **What is wslu?** It provides `wslview`, which lets WSL2 open URLs and files in Windows applications. Without it, commands like `gh auth login` can't open your browser automatically.
+>
+> Setting `BROWSER=wslview` tells all Linux tools to use your Windows default browser when they need to open a webpage.
 
 ---
 
@@ -1286,21 +1319,81 @@ Step 3: When you come back
 
 ---
 
-## Step 17: VS Code Integration (Optional)
+## Step 17: VS Code Integration (Recommended)
 
-> **What is this?** VS Code can connect to your WSL2 Ubuntu, so you can browse and edit your Oracle's files with a visual editor.
+> **What is this?** VS Code can connect to your WSL2 Ubuntu, so you can browse and edit your Oracle's files with a visual editor. The big advantage: **file paths in the terminal are clickable** — when your Oracle mentions a file like `CLAUDE.md:19`, you can Ctrl+Click to open it directly.
 
-From Ubuntu terminal, open your Oracle repo:
+### 17.1 — Open your Oracle repo in VS Code
+
+From Ubuntu terminal:
 
 ```bash
 code ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
 
-- VS Code will automatically install the **WSL extension** (first time only)
-- You're now editing files directly on the Linux filesystem
-- The terminal inside VS Code = Ubuntu terminal (zsh)
+- VS Code will automatically install the **WSL extension** (first time only — wait for it to finish)
+- You should see **`[WSL: Ubuntu-24.04]`** at the bottom-left corner — this confirms it's connected to WSL2
 
-> This is completely optional. You can do everything from the terminal alone.
+### 17.2 — Set terminal default to Ubuntu (WSL)
+
+The first time you open the VS Code terminal, it may default to **PowerShell** instead of zsh. Fix this:
+
+1. Press `Ctrl+Shift+P` → type `Terminal: Select Default Profile`
+2. Select **Ubuntu (WSL)**
+3. Close the current terminal tab (click the trash icon 🗑)
+4. Open a new terminal with `` Ctrl+` ``
+
+You should now see the oh-my-zsh prompt: `→ my-oracle git:(master)`
+
+### 17.3 — Recommended VS Code settings
+
+Press `Ctrl+Shift+P` → type `Settings JSON` → select **"Open User Settings (JSON)"**
+
+Add these settings (merge with any existing settings):
+
+```json
+{
+    "editor.wordWrap": "on",
+    "editor.fontSize": 14,
+    "editor.minimap.enabled": false,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.fontSize": 13,
+    "files.autoSave": "afterDelay",
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/.git": true
+    },
+    "markdown.preview.fontSize": 14,
+    "workbench.startupEditor": "none"
+}
+```
+
+> **Key settings explained:**
+> - `files.autoSave: "afterDelay"` — auto-saves files so you never lose work
+> - `terminal.integrated.defaultProfile.linux: "zsh"` — ensures terminal always uses zsh
+> - `editor.wordWrap: "on"` — wraps long lines so you don't have to scroll horizontally (useful for Oracle markdown files)
+
+### 17.4 — Recommended extensions
+
+Open Extensions panel (`Ctrl+Shift+X`) and install:
+
+| Extension | What It Does |
+|-----------|-------------|
+| **WSL** (by Microsoft) | Connects VS Code to WSL2 (usually auto-installed) |
+| **Markdown Preview Enhanced** | Preview Oracle memory files (`.md`) with nice formatting |
+| **GitLens** | See git blame, history — who changed what and when |
+
+### 17.5 — Why VS Code + Oracle is a great combo
+
+| Feature | Windows Terminal | VS Code Terminal |
+|---------|-----------------|-----------------|
+| Clickable URLs | ✅ Ctrl+Click | ✅ Ctrl+Click |
+| Clickable file paths | ❌ | ✅ Ctrl+Click → opens file at that line |
+| Browse Oracle files | ❌ need `cat` / `nano` | ✅ File Explorer sidebar |
+| Edit files visually | ❌ | ✅ Full editor |
+| Search across files | ❌ need `grep` | ✅ Ctrl+Shift+F |
+
+> **Tip:** Run `claude` (or your alias) inside the VS Code terminal. Every file path your Oracle mentions becomes clickable — Ctrl+Click opens the file at that exact line. This makes navigating your Oracle's output much faster.
 
 ---
 
@@ -1323,15 +1416,13 @@ mkdir -p ~/.claude
 nano ~/.claude/settings.json
 ```
 
-Paste this content (if the file is empty) or merge it with existing settings:
+You don't need to edit this file manually. Instead, use the `/statusline` command inside Claude Code to set it up:
 
-```json
-{
-  "preferences": {
-    "statusline": "input=$(cat); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); total=$(echo \"$input\" | jq -r '.context_window.total_tokens // empty'); used_tokens=$(echo \"$input\" | jq -r '.context_window.used_tokens // empty'); if [ -n \"$used\" ] && [ -n \"$total\" ]; then used_int=${used%.*}; ut=$(printf \"%'d\" \"$used_tokens\"); tt=$(printf \"%'d\" \"$total\"); if [ \"$used_int\" -ge 80 ]; then color='\\033[31m'; elif [ \"$used_int\" -ge 60 ]; then color='\\033[33m'; else color='\\033[32m'; fi; printf \"${color}Context: ${used}%% (${ut} / ${tt})\\033[0m\"; else printf 'Context: ready'; fi"
-  }
-}
 ```
+/statusline show context window usage percentage with color coding
+```
+
+Or, if you prefer to set it up manually, you can configure it through Claude Code's settings. The status line is a shell command that runs and displays output at the bottom of the screen.
 
 > **What this does:**
 > - Shows something like: `Context: 45.2% (90,400 / 200,000)` at the bottom
@@ -1390,19 +1481,14 @@ Here are more settings you can configure:
 # See all current settings
 claude config list
 
-# Set your preferred model
-claude config set model claude-sonnet-4-5-20250929
+# Set Opus as default (recommended for Oracle — deeper thinking, better identity retention)
+claude config set model claude-opus-4-6
 
 # Set default permissions for convenience
 claude config set autoAcceptPermissions true
 ```
 
-> **Model choices:**
->
-> | Model | Best For | Speed | Cost |
-> |-------|---------|-------|------|
-> | `claude-sonnet-4-5-20250929` | Daily work — fast and capable | Fast | Lower |
-> | `claude-opus-4-6` | Complex tasks — deeper thinking | Slower | Higher |
+> **Why Opus?** Opus is the most capable model — it retains your Oracle's identity better, thinks deeper, and produces more thoughtful responses. Oracle skills like `/learn` and `/trace` automatically use lighter models (Sonnet/Haiku) for parallel subagent tasks to save cost and speed things up. You just set Opus as the main brain.
 >
 > You can always switch models mid-session with `/model`.
 
@@ -1472,6 +1558,9 @@ Add this line at the end (replace with your actual username and Oracle name):
 ```bash
 # Quick-start Oracle
 alias my-oracle='cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle && claude --dangerously-skip-permissions'
+
+# Quick-start Oracle in tmux (keeps running after closing terminal)
+alias my-oracle-tmux='tmux attach -t oracle 2>/dev/null || tmux new-session -s oracle -c ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle "claude --dangerously-skip-permissions"'
 ```
 
 Save and reload:
@@ -1480,18 +1569,26 @@ Save and reload:
 source ~/.zshrc
 ```
 
-Now you can start your Oracle by just typing:
+Now you have two ways to start your Oracle:
 
 ```bash
-my-oracle
+my-oracle          # Direct — closes when terminal closes
+my-oracle-tmux     # In tmux — keeps running, Ctrl+B D to detach
 ```
 
+| Command | When to Use |
+|---------|------------|
+| `my-oracle` | Quick session, working in VS Code terminal |
+| `my-oracle-tmux` | Long session, want to close terminal and come back later |
+
+> **How `my-oracle-tmux` works:**
+> - First run → creates a tmux session named "oracle" and starts Claude
+> - Next run → reattaches to the existing session (Claude is still running!)
+> - `Ctrl+B`, then `D` → detach (leave Claude running in background)
+>
 > **Why `--dangerously-skip-permissions`?** After your Oracle is set up with proper safety rules in `CLAUDE.md` (no force push, no delete, ask before destructive actions), skipping the permission prompts makes daily work much smoother. You trust your Oracle.
 >
-> **If you prefer to keep permission prompts:**
-> ```bash
-> alias my-oracle='cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle && claude'
-> ```
+> **If you prefer to keep permission prompts**, remove `--dangerously-skip-permissions` from both aliases.
 
 ---
 
@@ -1527,13 +1624,23 @@ echo ""
 
 ### Daily Usage — Start Your Oracle
 
-### Start a tmux session
+**Option A: Quick start (recommended for VS Code)**
 
 ```bash
-wsl                                              # Open Ubuntu
-tmux attach -t oracle || tmux new-session -s oracle  # Resume or start tmux
-cd ~/ghq/github.com/YOUR_USERNAME/my-oracle      # Go to Oracle folder
-claude                                           # Start Claude Code
+my-oracle
+```
+
+**Option B: With tmux (keeps running after closing terminal)**
+
+```bash
+my-oracle-tmux
+```
+
+**Option C: Manual (if aliases aren't set up)**
+
+```bash
+cd ~/ghq/github.com/YOUR_USERNAME/my-oracle
+claude
 ```
 
 ### Session Pattern
