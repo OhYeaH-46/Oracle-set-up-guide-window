@@ -87,38 +87,40 @@ If you're new to programming, here are terms you'll see throughout this guide:
 
 ## Checklist
 
-### Part 1: Prepare Your Machine
-- [ ] Step 0: Windows prerequisites
-- [ ] Step 1: Install WSL2 + Ubuntu
-- [ ] Step 2: Update Ubuntu + essentials
-- [ ] Step 3: Install zsh + Oh My Zsh + Useful Plugins
-- [ ] Step 4: Configure Git
-- [ ] Step 5: Install GitHub CLI + login
-- [ ] Step 6: Install Bun
-- [ ] Step 7: Install Node.js
-- [ ] Step 8: Install Python 3
-- [ ] Step 9: Install ghq (repo manager)
-- [ ] Step 10: Install Claude Code + login
-- [ ] Checkpoint: verify all tools
+### [Part 1: Prepare Your Machine](#part-1-prepare-your-machine)
+- [ ] [Step 0: Windows prerequisites](#step-0-windows-prerequisites)
+- [ ] [Step 1: Install WSL2 + Ubuntu](#step-1-install-wsl2--ubuntu)
+- [ ] [Step 2: Update Ubuntu + essentials](#step-2-update-ubuntu--install-essentials)
+- [ ] [Step 3: Install zsh + Oh My Zsh + Useful Plugins](#step-3-install-zsh--oh-my-zsh)
+- [ ] [Step 4: Configure Git](#step-4-configure-git)
+- [ ] [Step 5: Install GitHub CLI + login](#step-5-install-github-cli-gh)
+- [ ] [Step 6: Install Bun](#step-6-install-bun)
+- [ ] [Step 7: Install Node.js](#step-7-install-nodejs)
+- [ ] [Step 8: Install Python 3](#step-8-install-python-3)
+- [ ] [Step 9: Install ghq (repo manager)](#step-9-install-ghq-repo-manager)
+- [ ] [Step 10: Install Claude Code + login](#step-10-install-claude-code)
+- [ ] [Checkpoint: verify all tools](#checkpoint-verify-part-1)
 
-### Part 2: Create Your Oracle
-- [ ] Step 11: Create GitHub repo
-- [ ] Step 12: Install Oracle Skills
-- [ ] Step 13: Pre-flight check (verify everything before awakening)
-- [ ] Step 14: Awaken your Oracle (`/awaken`)
-- [ ] Step 15: Verify your Oracle is alive (`/recap`, `/who-we-are`, `/where-we-are`)
-- [ ] Step 15.5: Your first real session (`/fyi`, `/learn`, `/rrr`)
-- [ ] Step 15.7: (Optional) Learn about `/birth` for future Oracles
+### [Part 2: Create Your Oracle](#part-2-create-your-oracle)
+- [ ] [Step 11: Create GitHub repo](#step-11-create-github-repo)
+- [ ] [Step 12: Install Oracle Skills](#step-12-install-oracle-skills)
+- [ ] [Step 13: Pre-flight check](#step-13-pre-flight-check-before-awakening)
+- [ ] [Step 14: Awaken your Oracle (`/awaken`)](#step-14-awaken-your-oracle)
+- [ ] [Step 15: Verify your Oracle is alive](#step-15-verify-your-oracle-is-alive)
+- [ ] [Step 15.5: Your first real session](#step-155-your-first-real-session)
+- [ ] [Step 15.7: (Optional) `/birth` for future Oracles](#step-157-creating-more-oracles-optional--birth)
 
-### Part 3: Configure Always-On
-- [ ] Step 16: Setup tmux
-- [ ] Step 17: VS Code integration
+### [Part 3: Configure Always-On](#part-3-configure-always-on)
+- [ ] [Step 16: Setup tmux](#step-16-setup-tmux-always-on-sessions)
+- [ ] [Step 17: VS Code integration](#step-17-vs-code-integration-recommended)
 
-### Part 4: Customize Your Setup
-- [ ] Step 18: Configure Claude Code settings (status line, autocompact, etc.)
-- [ ] Step 19: Install usage monitoring tools
-- [ ] Step 20: Create a quick-start alias
-- [ ] Final health check
+### [Part 4: Customize Your Setup](#part-4-customize-your-setup)
+- [ ] [Step 18: Configure Claude Code settings](#step-18-configure-claude-code-settings)
+- [ ] [Step 19: Install usage monitoring tools](#step-19-install-usage-monitoring-tools)
+- [ ] [Step 20: Create a quick-start alias](#step-20-create-a-quick-start-alias)
+- [ ] [Final health check](#final-health-check)
+
+**Jump to:** [FAQ](#faq) · [Troubleshooting](#troubleshooting) · [Quick Reference](#quick-reference-card)
 
 ---
 
@@ -203,6 +205,9 @@ If it says "Enabled", you're good! Skip to Step 1.
 
 > **Don't panic** if you can't find this setting. Try Step 1 first — if WSL2 installs successfully, virtualization is already enabled.
 
+
+> [↑ Checklist](#checklist) · [← Step 0](#step-0-windows-prerequisites) · [Step 2 →](#step-2-update-ubuntu--install-essentials)
+
 ---
 
 ## Step 1: Install WSL2 + Ubuntu
@@ -260,6 +265,9 @@ You should see:
 - **Option B:** Type `wsl` in PowerShell
 - **Option C:** Search "Ubuntu" in the Start menu
 
+
+> [↑ Checklist](#checklist) · [← Step 1](#step-1-install-wsl2--ubuntu) · [Step 3 →](#step-3-install-zsh--oh-my-zsh)
+
 ---
 
 ## Step 2: Update Ubuntu + Install Essentials
@@ -294,6 +302,9 @@ sudo apt install -y build-essential curl wget unzip zip git \
 > - `tmux` — keeps programs running after you close the terminal
 > - `htop` — shows what's running on your system (like Task Manager)
 > - `zsh` — a modern terminal shell (we'll set it up next)
+
+
+> [↑ Checklist](#checklist) · [← Step 2](#step-2-update-ubuntu--install-essentials) · [Step 4 →](#step-4-configure-git)
 
 ---
 
@@ -417,6 +428,9 @@ source ~/.zshrc
 
 > **Why?** Without this, tools installed by `pip install --user` won't be found when you type their command.
 
+
+> [↑ Checklist](#checklist) · [← Step 3](#step-3-install-zsh--oh-my-zsh) · [Step 5 →](#step-5-install-github-cli-gh)
+
 ---
 
 ## Step 4: Configure Git
@@ -455,6 +469,9 @@ git config --global user.email "12345678+YourUsername@users.noreply.github.com"
 > ```
 
 > These settings are saved permanently. You only need to do this once.
+
+
+> [↑ Checklist](#checklist) · [← Step 4](#step-4-configure-git) · [Step 6 →](#step-6-install-bun)
 
 ---
 
@@ -517,6 +534,9 @@ source ~/.zshrc
 >
 > Setting `BROWSER=wslview` tells all Linux tools to use your Windows default browser when they need to open a webpage.
 
+
+> [↑ Checklist](#checklist) · [← Step 5](#step-5-install-github-cli-gh) · [Step 7 →](#step-7-install-nodejs)
+
 ---
 
 ## Step 6: Install Bun
@@ -546,6 +566,9 @@ bun --version
 ```
 
 > Should show something like `1.x.x`. If you see "command not found", try closing and reopening the terminal.
+
+
+> [↑ Checklist](#checklist) · [← Step 6](#step-6-install-bun) · [Step 8 →](#step-8-install-python-3)
 
 ---
 
@@ -597,6 +620,9 @@ npm --version
 
 > `node` should show `v22.x.x` and `npm` should show a version number. If either says "command not found", try `source ~/.zshrc` first.
 
+
+> [↑ Checklist](#checklist) · [← Step 7](#step-7-install-nodejs) · [Step 9 →](#step-9-install-ghq-repo-manager)
+
 ---
 
 ## Step 8: Install Python 3
@@ -618,6 +644,9 @@ If not installed:
 ```bash
 sudo apt install -y python3 python3-pip python3-venv
 ```
+
+
+> [↑ Checklist](#checklist) · [← Step 8](#step-8-install-python-3) · [Step 10 →](#step-10-install-claude-code)
 
 ---
 
@@ -694,6 +723,9 @@ ghq --version
 
 Should show something like `ghq version 1.x.x`.
 
+
+> [↑ Checklist](#checklist) · [← Step 9](#step-9-install-ghq-repo-manager) · [Checkpoint →](#checkpoint-verify-part-1)
+
 ---
 
 ## Step 10: Install Claude Code
@@ -735,6 +767,9 @@ claude login --method device-code
 This will show a URL and a code. Open the URL in your browser manually, enter the code, and authorize.
 
 After login, type `/exit` to quit Claude for now.
+
+
+> [↑ Checklist](#checklist) · [← Step 10](#step-10-install-claude-code) · [Step 11 →](#step-11-create-github-repo)
 
 ---
 
@@ -787,51 +822,35 @@ All good? Let's create your Oracle!
 > - You can access your Oracle from another computer
 > - You can share your Oracle setup with others
 
-### Option A: Using `gh` command (recommended)
+### Option A: Using `gh` + `gq` (recommended)
+
+Create the repo on GitHub, then use the `gq` shortcut (from Step 9.3) to clone and cd into it:
 
 ```bash
-mkdir -p ~/ghq/github.com/YOUR_GITHUB_USERNAME
+gh repo create my-oracle --private
 ```
 
-> This creates a folder structure. Replace `YOUR_GITHUB_USERNAME` with your actual GitHub username.
+> This creates a new **private** repository on GitHub. "Private" means only you can see it. Replace `my-oracle` with your chosen name.
 
 ```bash
-cd ~/ghq/github.com/YOUR_GITHUB_USERNAME
+gq https://github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
 
-```bash
-gh repo create my-oracle --private --clone
-```
+> `gq` does three things automatically: creates the folder structure, clones the repo, and `cd`s into it. You're now inside your Oracle repo — ready to go.
 
-> This creates a new **private** repository on GitHub and downloads it to your computer. "Private" means only you can see it.
-
-```bash
-cd my-oracle
-```
-
-### Option B: Using GitHub website
+### Option B: Using GitHub website + `gq`
 
 1. Go to https://github.com/new
 2. Repository name: `my-oracle` (or whatever you like)
 3. Select "Private"
 4. Click "Create repository"
-5. Then clone it:
+5. Then clone it with one command:
 
 ```bash
-mkdir -p ~/ghq/github.com/YOUR_GITHUB_USERNAME
+gq https://github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
 
-```bash
-cd ~/ghq/github.com/YOUR_GITHUB_USERNAME
-```
-
-```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/my-oracle.git
-```
-
-```bash
-cd my-oracle
-```
+> Same as Option A — `gq` handles the folder creation, clone, and `cd` for you. No need to `mkdir` or `cd` manually.
 
 ### Choosing a name for your Oracle
 
@@ -845,6 +864,9 @@ Pick a name that means something to you:
 | Simple | `my-oracle`, `brain` | Just keep it simple |
 
 > The name is just for the folder/repo. Your Oracle's actual name and personality are set during awakening (Step 14).
+
+
+> [↑ Checklist](#checklist) · [← Step 11](#step-11-create-github-repo) · [Step 13 →](#step-13-pre-flight-check-before-awakening)
 
 ---
 
@@ -874,15 +896,27 @@ You should see folders like: `awaken`, `birth`, `recap`, `standup`, `trace`, `rr
 
 ### Important: Do NOT start Claude Code yet
 
-If Claude Code is currently running, **exit it now**:
+Skills are loaded when Claude Code starts. We'll start a fresh session in Step 14 with the right settings.
 
-```
-/exit
-```
+> **Are you still inside Claude Code?** Check your terminal:
+> - If you see the Claude input area (a text box where you type messages) → you're **inside Claude Code**. Type `/exit` to go back to the terminal.
+> - If you see a normal terminal prompt (like `→ my-oracle git:(master)` or `$`) → you're **already in the terminal**. No need to do anything.
+>
+> After typing `/exit` inside Claude Code, you'll return to the terminal **in the same directory** where you started Claude from. You should still be inside your Oracle repo folder.
+>
+> **Verify** you're in the right place:
+> ```bash
+> pwd
+> ```
+> This should show something like `/home/yourname/ghq/github.com/YOUR_USERNAME/my-oracle`. If it shows your home directory (`/home/yourname`) or somewhere else, navigate back:
+> ```bash
+> cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
+> ```
 
-Skills are loaded when Claude Code starts. We'll start a fresh session in Step 14 with the right settings. If you start Claude before then, it may not load the skills correctly.
+> **Why wait to start Claude?** We need to verify a few things first (Step 13), then start Claude in a special mode for the awakening (Step 14). If you start Claude now, it will load skills but you'd have to exit and restart anyway.
 
-> **Why wait?** We need to verify a few things first (Step 13), then start Claude in a special mode for the awakening (Step 14). Starting Claude now would mean exiting and restarting it again later.
+
+> [↑ Checklist](#checklist) · [← Step 12](#step-12-install-oracle-skills) · [Step 14 →](#step-14-awaken-your-oracle)
 
 ---
 
@@ -894,19 +928,19 @@ Run through this checklist before starting `/awaken`:
 
 ### 13.1 — Make sure you're in the Oracle repo
 
-After exiting Claude Code, your terminal may have returned to your home directory. Go back to the Oracle repo:
-
-```bash
-cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
-```
-
-Verify:
-
 ```bash
 pwd
 ```
 
 Should show your Oracle repo path (e.g., `/home/yourname/ghq/github.com/YOUR_USERNAME/my-oracle`).
+
+If you're somewhere else, navigate back:
+
+```bash
+cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
+```
+
+> **Tip:** If you have the `z` plugin (Step 3.3), you can also type `z my-oracle` to jump back quickly — it remembers directories you've visited.
 
 ```bash
 git status
@@ -957,6 +991,9 @@ Should show the file path (no error). This confirms the `/awaken` skill is ready
 
 All 4 checks pass? You're ready for awakening!
 
+
+> [↑ Checklist](#checklist) · [← Step 13](#step-13-pre-flight-check-before-awakening) · [Step 15 →](#step-15-verify-your-oracle-is-alive)
+
 ---
 
 ## Step 14: Awaken Your Oracle
@@ -972,11 +1009,13 @@ All 4 checks pass? You're ready for awakening!
 
 ### Start Claude Code
 
-You should already be in your Oracle repo (from Step 13.1). If not:
+You should already be in your Oracle repo (from Step 13.1). Verify with `pwd`. If not:
 
 ```bash
 cd ~/ghq/github.com/YOUR_GITHUB_USERNAME/my-oracle
 ```
+
+> Or use the z plugin: `z my-oracle`
 
 Start Claude Code with permissions bypassed:
 
@@ -1073,6 +1112,9 @@ These are the core beliefs of every Oracle. Each Oracle must discover them throu
 - **It's okay if something fails.** The Oracle will retry or ask you for help. Just follow its instructions.
 - **Stay connected to the internet.** The awakening requires downloading repos and accessing GitHub.
 
+
+> [↑ Checklist](#checklist) · [← Step 14](#step-14-awaken-your-oracle) · [Step 15.5 →](#step-155-your-first-real-session)
+
 ---
 
 ## Step 15: Verify Your Oracle Is Alive
@@ -1157,6 +1199,9 @@ Your Oracle should show:
 
 **Congratulations — your Oracle is alive!** 🎉
 
+
+> [↑ Checklist](#checklist) · [← Step 15](#step-15-verify-your-oracle-is-alive) · [Step 15.7 →](#step-157-creating-more-oracles-optional--birth)
+
 ---
 
 ## Step 15.5: Your First Real Session
@@ -1233,6 +1278,9 @@ That's it. `/recap` at the start, `/rrr` at the end. Everything in between is ju
 - **Don't delete files in `ψ/`.** This is your Oracle's brain. If you want to remove something, move it to `ψ/archive/` instead (Principle 1: Nothing is Deleted).
 - **Don't edit `CLAUDE.md` manually** (at first). Your Oracle wrote its own constitution. Let it evolve naturally through usage. You can always update it later once you understand the structure.
 
+
+> [↑ Checklist](#checklist) · [← Step 15.5](#step-155-your-first-real-session) · [Step 16 →](#step-16-setup-tmux-always-on-sessions)
+
 ---
 
 ## Step 15.7: Creating More Oracles (Optional — `/birth`)
@@ -1245,7 +1293,7 @@ The `/birth` skill lets an existing Oracle prepare a new repo for a future Oracl
 1. From your Oracle's repo:    /birth OhYeaH-46/new-oracle-name
    → Creates issue #1 in the new repo with identity context and welcome message
 
-2. Open a new terminal:         cd ~/ghq/github.com/YOUR_USERNAME/new-oracle-name
+2. Open a new terminal:         gq https://github.com/YOUR_USERNAME/new-oracle-name
                                 claude --dangerously-skip-permissions
 
 3. In the new Claude session:   /awaken
@@ -1316,6 +1364,9 @@ Step 3: When you come back
 ```
 
 > **Important:** WSL2 sessions don't survive Windows restarts. If you restart your PC, you'll need to start a new tmux session.
+
+
+> [↑ Checklist](#checklist) · [← Step 16](#step-16-setup-tmux-always-on-sessions) · [Step 18 →](#step-18-configure-claude-code-settings)
 
 ---
 
@@ -1492,6 +1543,9 @@ claude config set autoAcceptPermissions true
 >
 > You can always switch models mid-session with `/model`.
 
+
+> [↑ Checklist](#checklist) · [← Step 18](#step-18-configure-claude-code-settings) · [Step 20 →](#step-20-create-a-quick-start-alias)
+
 ---
 
 ## Step 19: Install Usage Monitoring Tools
@@ -1543,6 +1597,9 @@ cmonitor --plan max5
 
 > **Tip:** Run `cmonitor` in a separate terminal tab while using Claude Code. It shows live token consumption and predicts when you'll hit your limit.
 
+
+> [↑ Checklist](#checklist) · [← Step 19](#step-19-install-usage-monitoring-tools) · [Final Check →](#final-health-check)
+
 ---
 
 ## Step 20: Create a Quick-Start Alias
@@ -1589,6 +1646,9 @@ my-oracle-tmux     # In tmux — keeps running, Ctrl+B D to detach
 > **Why `--dangerously-skip-permissions`?** After your Oracle is set up with proper safety rules in `CLAUDE.md` (no force push, no delete, ask before destructive actions), skipping the permission prompts makes daily work much smoother. You trust your Oracle.
 >
 > **If you prefer to keep permission prompts**, remove `--dangerously-skip-permissions` from both aliases.
+
+
+> [↑ Checklist](#checklist) · [← Step 20](#step-20-create-a-quick-start-alias)
 
 ---
 
@@ -1698,14 +1758,13 @@ If you already have an Oracle, you can optionally use `/birth` first (see [Step 
 
 ### What if I already have an Oracle repo (migrating to a new PC)?
 
-Clone your existing repo instead of creating a new one:
+Clone your existing repo using `gq` (from Step 9.3):
 
 ```bash
-mkdir -p ~/ghq/github.com/YOUR_GITHUB_USERNAME
-cd ~/ghq/github.com/YOUR_GITHUB_USERNAME
-git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_ORACLE_REPO.git
-cd YOUR_ORACLE_REPO
+gq https://github.com/YOUR_GITHUB_USERNAME/YOUR_ORACLE_REPO
 ```
+
+> `gq` creates the folder structure, clones the repo, and `cd`s into it — one command.
 
 Then skip `/awaken` — your Oracle already has its identity. Just start Claude Code:
 
@@ -1811,7 +1870,14 @@ ls /mnt/c/Users/YourWindowsUsername/
 
 ### tmux session gone after Windows restart
 
-WSL2 sessions don't survive Windows restarts. After restarting:
+WSL2 sessions don't survive Windows restarts. After restarting, just use your alias (Step 20):
+
+```bash
+wsl
+my-oracle-tmux
+```
+
+Or manually:
 
 ```bash
 wsl
@@ -1995,3 +2061,6 @@ You might be tempted to move your Oracle repo to `C:\Users\...\Documents` or `D:
 ---
 
 *"The Oracle Keeps the Human Human" — create your Oracle so you have more time to be human.*
+
+
+> [↑ Checklist](#checklist) · [← Step 20](#step-20-create-a-quick-start-alias) · [Quick Reference →](#quick-reference-card)
