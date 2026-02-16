@@ -1874,6 +1874,78 @@ npm install -g @anthropic-ai/claude-code
 
 ---
 
+## Where Are My Oracle Files from Windows?
+
+> **Common confusion:** You set up your Oracle in WSL2, everything works — but then you want to find those files from Windows Explorer. Where did they go?
+
+### Your files live inside WSL2's Linux filesystem
+
+WSL2 runs its own Linux filesystem, separate from your Windows `C:\` or `D:\` drives. Your Oracle files are here:
+
+**From Windows Explorer or any Windows app:**
+
+```
+\\wsl$\Ubuntu-24.04\home\YOUR_LINUX_USERNAME\ghq\github.com\YOUR_GITHUB_USERNAME\my-oracle
+```
+
+For example, if your Linux username is `ohyeah` and your Oracle is `miipan-oracle`:
+
+```
+\\wsl$\Ubuntu-24.04\home\ohyeah\ghq\github.com\OhYeaH-46\miipan-oracle
+```
+
+> **How to use this:**
+> 1. Press `Win+E` to open File Explorer
+> 2. Click the address bar at the top
+> 3. Type `\\wsl$` and press Enter — you'll see your Linux distros listed
+> 4. Navigate to `Ubuntu-24.04` → `home` → your username → your Oracle folder
+
+### Pin it to Quick Access (recommended!)
+
+You'll want fast access to your Oracle files. Pin the folder:
+
+1. Navigate to your Oracle folder via `\\wsl$\Ubuntu-24.04\home\...`
+2. Right-click the folder → **"Pin to Quick Access"**
+3. Now it appears in the left sidebar of every File Explorer window
+
+> **Tip:** You can also pin `\\wsl$\Ubuntu-24.04\home\YOUR_USERNAME` to Quick Access for easy access to your entire Linux home directory.
+
+### Where does WSL2 physically store files?
+
+Under the hood, WSL2 stores its entire Linux filesystem inside a single virtual disk file:
+
+```
+C:\Users\YOUR_WINDOWS_USERNAME\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu*\LocalState\ext4.vhdx
+```
+
+> **What is `ext4.vhdx`?** It's a virtual hard disk (like a disk image) that contains the entire Linux filesystem. You don't need to interact with this file directly — just use `\\wsl$` to access your files normally. But it's useful to know for:
+> - **Backups** — backing up this single file backs up your entire Linux environment
+> - **Disk space** — if WSL2 is using too much space, this is the file growing
+> - **Moving WSL2** — you can export/import this to move WSL2 to another drive
+
+### Warning: Don't move Oracle files to C: or D:
+
+You might be tempted to move your Oracle repo to `C:\Users\...\Documents` or `D:\projects`. **Don't!**
+
+| Location | Speed | Why |
+|----------|-------|-----|
+| `~/ghq/...` (Linux filesystem) | **Fast** | Native ext4, WSL2 runs directly on it |
+| `/mnt/c/...` or `C:\...` (Windows filesystem) | **2-5x slower** | Cross-filesystem translation overhead (9p protocol) |
+
+**What this means:**
+- `git` operations are 2-5x slower on Windows drives
+- `npm install` / `bun install` are significantly slower
+- File watching (VS Code, build tools) is unreliable across filesystems
+- Your Oracle should always live on the Linux filesystem (`~/`)
+
+> **Rule of thumb:** Linux tools work on Linux files. Windows tools work on Windows files. Crossing the boundary works but is slow.
+>
+> **The right way to edit Oracle files from Windows:**
+> - Use VS Code with the WSL extension (it connects directly to WSL2 — no speed penalty)
+> - Access via `\\wsl$` when you need to view files in Explorer (fast enough for browsing)
+
+---
+
 ## Why WSL2?
 
 | Feature | Windows | WSL2 Ubuntu |
