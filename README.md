@@ -82,6 +82,7 @@ All three methods share the same settings and configuration. Your CLAUDE.md, MCP
 - [Path A: Claude Desktop App](path-a-desktop.md) — Easiest, ~10 min
 - [Path B: VS Code Extension](path-b-vscode.md) — Easy, ~15 min
 - [Path C: WSL2 Full Setup](path-c-wsl2.md) — Advanced, ~60 min (includes Oracle)
+- [Writing Your CLAUDE.md](writing-claude-md.md) — How to write your Oracle's constitution
 
 ## Resources
 
