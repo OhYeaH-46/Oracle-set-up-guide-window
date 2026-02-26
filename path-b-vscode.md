@@ -17,12 +17,12 @@
 | @-mention files | Yes | Reference any file, folder, or line range |
 | Terminal access | Yes | Full VS Code integrated terminal |
 | Auto-context | Yes | Claude sees your open files, selections, and errors |
-| Oracle Skills (60+ commands) | No | Requires Path C (WSL2 + CLI setup) |
-| Memory & Personality | No | Requires Path C |
+| Oracle Skills (60+ commands) | Extension: No / CLI in terminal: **Yes** | See [Two Ways to Use Claude Code](#two-ways-to-use-claude-code-in-vs-code) below |
+| Memory & Personality | Extension: No / CLI in terminal: **Yes** | Requires Oracle repo setup ([Path C](path-c-wsl2.md)) |
 | Always-on sessions (tmux) | No | Requires Path C |
-| MCP server configuration | No | Must use CLI for this |
+| MCP server configuration | Extension: No / CLI: **Yes** | Configure via CLI, extension picks it up |
 
-> **In short**: Path B gives you a powerful AI coding assistant inside VS Code. If you want the full Oracle experience (memory, personality, 60+ skills), continue to [Path C](path-c-wsl2.md) after completing this guide.
+> **In short**: Path B gives you a powerful AI coding assistant inside VS Code. You can use the **extension panel** for visual features, or run the **full CLI in the terminal** for complete power — including Oracle Skills. For the full Oracle setup (memory, personality, awakening), continue to [Path C](path-c-wsl2.md).
 
 ---
 
@@ -158,7 +158,44 @@ Create a new file called helpers.js with a function that validates email address
 
 ---
 
-## Key Features
+## Two Ways to Use Claude Code in VS Code
+
+This is important to understand: there are **two different ways** to use Claude Code inside VS Code, and they have different capabilities.
+
+### Method 1: Extension Panel (Visual)
+
+This is what you set up in Steps 2-5 above. You interact with Claude through a **chat panel** inside VS Code.
+
+**Strengths**: Visual diff review, @-mention files, auto-context from open files/selections, drag & drop images.
+
+**Limitation**: Only a subset of slash commands are available. Some advanced features (like Oracle Skills) don't work in the panel.
+
+### Method 2: CLI in VS Code Terminal (Full Power)
+
+You can also open VS Code's built-in terminal (press `` Ctrl+` ``) and type `claude` to run the **full Claude Code CLI** — the same tool used in [Path C](path-c-wsl2.md).
+
+```
+# Open VS Code's integrated terminal: Ctrl+`
+# Then just type:
+claude
+```
+
+**Strengths**: Every command works. All slash commands, all Oracle Skills (`/recap`, `/trace`, `/learn`, `/rrr`, etc.), full MCP configuration, scripting, agent teams — everything.
+
+**Limitation**: Text-based interface (no visual diffs or @-mentions). But you get clickable file paths — Ctrl+Click on any file path to open it in VS Code.
+
+### Best of Both Worlds
+
+You can use **both methods at the same time**! Many developers use this workflow:
+
+- **Extension panel** for visual tasks: reviewing diffs, quick questions about highlighted code, @-mentioning files
+- **CLI in terminal** for power tasks: Oracle Skills, complex multi-file operations, MCP servers
+
+> **Pro tip**: If you connect VS Code to WSL2 (see [Optional: Connect to WSL2](#optional-connect-to-wsl2)), running `claude` in the terminal gives you the full Linux environment. Combined with an Oracle repo from [Path C](path-c-wsl2.md), you get the **complete Oracle experience inside VS Code** — visual editor + full CLI + all 60+ skills.
+
+---
+
+## Key Features (Extension Panel)
 
 Here's what makes the VS Code extension especially useful:
 
@@ -285,17 +322,17 @@ This means:
 
 ---
 
-## Limitations (What You CAN'T Do in the Extension)
+## Limitations of the Extension Panel
 
-The VS Code extension is powerful, but it doesn't have everything the full CLI offers:
+These limitations apply **only to the extension panel** (Method 1). If you run `claude` in the terminal (Method 2), none of these apply.
 
-- **Only a subset of slash commands** — Not all CLI commands are available in the extension
-- **No MCP server configuration** — To set up MCP (Model Context Protocol) servers, you need the CLI
+- **Only a subset of slash commands** — Not all CLI commands are available in the extension panel
+- **No MCP server configuration** — To set up MCP servers, use the CLI (`claude mcp add`)
 - **No `!` bash shortcut** — In the CLI, you can type `!ls` to run shell commands directly; the extension doesn't support this
 - **No tab completion** — The CLI offers tab-completion for file paths and commands; the extension uses @-mentions instead
-- **No tmux (always-on sessions)** — The CLI can run inside tmux so it persists when you close the terminal; the extension stops when you close VS Code
+- **No tmux (always-on sessions)** — Closing VS Code ends the extension session. But if you run the CLI inside tmux in the VS Code terminal, it persists
 
-For most day-to-day work, these limitations won't matter. But if you need the full toolkit, [Path C](path-c-wsl2.md) covers the complete setup.
+> **Remember**: You can bypass all of these by running `claude` in the VS Code terminal. The terminal gives you the full CLI experience while keeping VS Code open for file browsing and editing. See [Two Ways to Use Claude Code](#two-ways-to-use-claude-code-in-vs-code).
 
 ---
 

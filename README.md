@@ -29,7 +29,7 @@ This guide offers three paths to get Claude Code running on Windows. Pick the on
 | **Visual interface** | ✅ Built-in | ✅ In VS Code | ❌ Text only |
 | **Visual diff review** | ✅ | ✅ | ❌ |
 | **@-mention files** | ✅ | ✅ | ❌ |
-| **Oracle support** | ❌ | ❌ | ✅ Full (60+ skills) |
+| **Oracle support** | ❌ | ⚡ Via CLI in terminal | ✅ Full (60+ skills) |
 | **Always-on (tmux)** | ❌ | ❌ | ✅ |
 | **Agent teams** | ❌ | ❌ | ✅ |
 
@@ -58,7 +58,7 @@ This guide offers three paths to get Claude Code running on Windows. Pick the on
 
 - **Path A → Path C**: Start with Desktop App to try Claude Code, then set up WSL2 later for Oracle
 - **Path B → Path C**: Use VS Code Extension daily, add WSL2 for Oracle features
-- **Path B + Path C together**: Use VS Code Extension connected to WSL2 — best of both worlds (visual editor + Oracle skills)
+- **Path B + Path C together**: Use VS Code connected to WSL2 and run `claude` in the terminal — best of both worlds (visual editor + full Oracle skills). This is the recommended setup for daily use.
 
 All three methods share the same settings and configuration. Your CLAUDE.md, MCP servers, and preferences work across all of them.
 
