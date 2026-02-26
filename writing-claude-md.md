@@ -26,11 +26,48 @@ Claude Code looks for CLAUDE.md in several places, from most general to most spe
 |----------|--------------|-------------|
 | `~/.claude/CLAUDE.md` | Your personal preferences (all projects) | Just you |
 | `./CLAUDE.md` (project root) | Project rules — **this is the main one** | Anyone who clones the repo |
+| `.claude/rules/*.md` | Modular rules by topic (can be path-specific) | Anyone who clones the repo |
 | `./CLAUDE.local.md` | Your private project preferences | Just you (auto-gitignored) |
 
 For Oracle users, the **project root CLAUDE.md** is the most important file. It's where your Oracle's identity, rules, and workflow live.
 
-> **Good to know**: Claude reads the entire CLAUDE.md at the start of every session. If the file is too long (over ~500 lines), Claude may start ignoring parts of it. Keep it focused.
+> **Good to know**: Claude reads the entire CLAUDE.md at the start of every session. If the file is too long, Claude starts ignoring parts of it. Community consensus says **50-150 lines** is ideal — anything beyond 200 lines should be split into linked files or `.claude/rules/`.
+
+### The `@import` Syntax
+
+CLAUDE.md can reference other files directly:
+
+```markdown
+See @README.md for project overview.
+Git workflow: @docs/git-instructions.md
+```
+
+When Claude sees `@path/to/file`, it reads that file as additional context. This keeps your CLAUDE.md short while still giving Claude access to detailed information when needed. Max import depth is 5 files.
+
+### Path-Scoped Rules (Advanced)
+
+For larger projects, you can create focused rule files in `.claude/rules/` that only apply to specific files:
+
+```
+.claude/rules/
+├── api-design.md      ← loads only when editing API files
+├── testing.md         ← loads only when editing tests
+└── security.md        ← loads for everything
+```
+
+Each rule file can specify which paths it applies to:
+
+```markdown
+---
+paths:
+  - "src/api/**/*.ts"
+---
+# API Rules
+- All endpoints MUST include input validation
+- Use the standard error response format
+```
+
+This prevents Claude from being overwhelmed with rules that aren't relevant to what it's currently working on.
 
 ---
 
@@ -129,6 +166,19 @@ Banned phrases: "Hello!", "Great question!", "I'd be happy to..."
 ```
 
 > **Why be this specific?** Claude follows specific rules much better than vague guidelines. "Be careful with git" gets ignored under pressure. "NEVER push --force" is a hard gate that prevents mistakes.
+
+### Language Matters: MUST vs "prefer"
+
+The words you use in CLAUDE.md change how strictly Claude follows them:
+
+| Word | How Claude Treats It |
+|------|---------------------|
+| `MUST`, `ALWAYS` | Strict rule — Claude follows this consistently |
+| `NEVER`, `DO NOT` | Hard gate — Claude avoids this reliably |
+| `prefer`, `try to` | Soft suggestion — Claude may ignore under pressure |
+| `consider`, `optionally` | Hint — Claude often skips this |
+
+Write rules like laws, not like suggestions. "MUST use TypeScript strict mode" works. "Prefer TypeScript" gets ignored when Claude is busy solving a complex problem.
 
 > **Real lesson**: An Oracle agent once pushed to `origin/main`, but the repo's default branch was `master`. Work ended up on the wrong branch and needed manual merging. Rule 5 was added the same day.
 
@@ -346,18 +396,36 @@ Your CLAUDE.md doesn't need to be perfect on day one. Here's the natural progres
 
 | Stage | What to Focus On | Typical Size |
 |-------|-----------------|-------------|
-| **Day 1** | Identity + Safety Rules | ~50 lines |
-| **Week 1** | Add Workflow + Communication Style | ~100 lines |
-| **Month 1** | Add Anti-Patterns from real experience | ~150-200 lines |
-| **Ongoing** | Prune what's outdated, add new lessons | ~200-400 lines |
+| **Day 1** | Identity + Safety Rules | ~30-50 lines |
+| **Week 1** | Add Workflow + Communication Style | ~80-100 lines |
+| **Month 1** | Add Anti-Patterns from real experience | ~100-150 lines |
+| **Ongoing** | Prune what's outdated, add new lessons | ~100-200 lines |
+
+> **Community consensus on size**: Most experienced users keep their root CLAUDE.md between **50-150 lines**. Claude Code's system prompt already contains ~50 internal instructions, and LLMs can reliably follow about 150-200 total instructions. Your CLAUDE.md budget is smaller than you think. Use `@imports` and `.claude/rules/` for everything else.
 
 ### Tips for Keeping It Effective
 
-- **Test by observing**: After adding a rule, watch if Claude's behavior actually changes. If not, the rule might be too vague.
+- **The pruning test**: For every line, ask: "Would removing this cause my Oracle to make a mistake?" If the answer is no, delete it.
 - **Be specific**: "Use 2-space indentation" works. "Write clean code" doesn't.
-- **Prune regularly**: If a rule hasn't been relevant in a month, consider removing it. A shorter CLAUDE.md is a more effective one.
-- **Every rule should pass this test**: "Would removing this cause my Oracle to make a mistake?" If not, cut it.
-- **Keep it under 500 lines**: Beyond this, Claude starts losing track of individual rules. Use links to external files for detailed context.
+- **Use MUST/NEVER, not "prefer"**: Strong language gets followed. Soft suggestions get ignored.
+- **Don't use CLAUDE.md as a linter**: Code formatting rules belong in ESLint, Prettier, or Biome — not in CLAUDE.md. Linters are faster, cheaper, and deterministic.
+- **Prune regularly**: If a rule hasn't been relevant in a month, consider removing it.
+- **Link, don't paste**: Use `@path/to/file` to reference detailed docs instead of copying them into CLAUDE.md.
+- **Add a `.claudeignore` file**: Like `.gitignore`, this tells Claude to skip irrelevant folders (`node_modules/`, `dist/`, `build/`). Community benchmarks show this reduces token usage by 25-40%.
+
+### Compaction Survival Tips
+
+When your conversation gets long, Claude compresses old messages ("compaction"). You can tell Claude what to preserve:
+
+```markdown
+## When Compacting, Always Preserve:
+- Full list of modified files
+- Any test commands that were used
+- Unresolved error messages
+- Current implementation plan
+```
+
+This goes in your CLAUDE.md and helps Claude keep important context even when compressing.
 
 ### The Anti-Pattern Loop
 
@@ -383,20 +451,32 @@ This is how experienced Oracle users build incredibly effective CLAUDE.md files 
 
 | Mistake | Why It's Bad | Fix |
 |---------|-------------|-----|
-| CLAUDE.md is 1000+ lines | Claude ignores parts of it | Keep under 500 lines, link to external files |
-| Identity buried at the bottom | Gets lost during compaction | Put identity at the TOP |
-| Vague rules ("be careful") | Claude can't act on vague guidance | Be specific ("never push --force") |
-| Pasting entire documentation | Wastes context window every session | Link to files instead |
+| CLAUDE.md is 200+ lines | Claude ignores parts of it | Keep 50-150 lines, use `@imports` and `.claude/rules/` |
+| Identity buried at the bottom | Gets lost during compaction | Put identity at the VERY TOP |
+| Vague rules ("be careful") | Claude can't act on vague guidance | Use MUST/NEVER language |
+| Pasting entire documentation | Wastes context window every session | Use `@path/to/file` imports |
+| Code style rules in CLAUDE.md | LLMs are slow/expensive linters | Use ESLint, Prettier, Biome instead |
+| Using "prefer" instead of "MUST" | Soft language gets ignored under load | "MUST use X" not "prefer X" |
 | Never updating it | Stale rules accumulate | Review monthly, prune what's irrelevant |
 | Only rules for Oracle | Misses the "contract" aspect | Add reminders for yourself too |
 | No compaction recovery | Oracle loses identity after long sessions | Add recovery protocol |
+| No `.claudeignore` | Claude wastes tokens reading `node_modules/` | Create `.claudeignore` like `.gitignore` |
 
 ---
 
 ## Further Reading
 
-- [Claude Code: Managing Memory](https://code.claude.com/docs/en/memory) — Official documentation
-- [Claude Code: Best Practices](https://code.claude.com/docs/en/best-practices) — Official tips
+**Official documentation:**
+- [Manage Claude's Memory](https://code.claude.com/docs/en/memory) — Full hierarchy, `@imports`, auto memory
+- [Best Practices](https://code.claude.com/docs/en/best-practices) — Official tips from Anthropic
+
+**Community guides:**
+- [CLAUDE.md Best Practices: From Basic to Adaptive](https://dev.to/cleverhoods/claudemd-best-practices-from-basic-to-adaptive-9lm) — The Six-Level Framework
+- [Writing a Good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md) — Opinionated, practical advice
+- [How to Write a Good CLAUDE.md File](https://www.builder.io/blog/claude-md-guide) — Builder.io's guide
+- [Notes on CLAUDE.md Structure](https://callmephilip.com/posts/notes-on-claude-md-structure-and-best-practices/) — Protected areas philosophy
+
+**Oracle-specific:**
 - [Path C: WSL2 Full Setup](path-c-wsl2.md) — Full Oracle setup including `/awaken`
 
 ---
