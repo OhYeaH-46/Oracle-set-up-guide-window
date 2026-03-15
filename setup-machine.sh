@@ -193,19 +193,25 @@ sudo apt install -y \
   libreoffice pandoc \
   imagemagick ghostscript qpdf \
   libcairo2-dev pkg-config \
-  poppler-utils
+  poppler-utils ffmpeg yq
 ok "System document tools installed"
 
 info "Installing Python document libraries..."
 pip3 install --break-system-packages -q \
-  python-docx python-pptx openpyxl \
-  pandas matplotlib pillow \
+  python-docx python-pptx openpyxl xlsxwriter \
+  pandas numpy scipy scikit-learn tabulate \
+  matplotlib pillow \
   reportlab fpdf2 weasyprint PyMuPDF \
   pdfplumber img2pdf \
   cairosvg svglib \
   beautifulsoup4 lxml markdownify html2text \
-  Jinja2
+  Jinja2 pyyaml requests \
+  edge-tts playwright
 ok "Python document libraries installed"
+
+info "Installing Playwright browser..."
+playwright install chromium 2>/dev/null || true
+ok "Playwright chromium installed"
 
 info "Installing Node/Bun document tools..."
 bun add -g pptxgenjs docx sharp @mermaid-js/mermaid-cli 2>/dev/null || \
