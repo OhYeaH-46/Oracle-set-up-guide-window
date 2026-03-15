@@ -186,7 +186,34 @@ else
 fi
 
 # ----------------------------------------------------------
-# 9. tmux config
+# 9. Document & Creative Tools
+# ----------------------------------------------------------
+info "Installing document tools (LibreOffice, ImageMagick, PDF tools)..."
+sudo apt install -y \
+  libreoffice pandoc \
+  imagemagick ghostscript qpdf \
+  libcairo2-dev pkg-config \
+  poppler-utils
+ok "System document tools installed"
+
+info "Installing Python document libraries..."
+pip3 install --break-system-packages -q \
+  python-docx python-pptx openpyxl \
+  pandas matplotlib pillow \
+  reportlab fpdf2 weasyprint PyMuPDF \
+  pdfplumber img2pdf \
+  cairosvg svglib \
+  beautifulsoup4 lxml markdownify html2text \
+  Jinja2
+ok "Python document libraries installed"
+
+info "Installing Node/Bun document tools..."
+bun add -g pptxgenjs docx sharp @mermaid-js/mermaid-cli 2>/dev/null || \
+  npm install -g pptxgenjs docx sharp @mermaid-js/mermaid-cli
+ok "Node/Bun document tools installed"
+
+# ----------------------------------------------------------
+# 10. tmux config
 # ----------------------------------------------------------
 if [ ! -f "$HOME/.tmux.conf" ]; then
   cat > ~/.tmux.conf << 'EOF'
@@ -220,6 +247,9 @@ echo "  Python:  $(python3 --version 2>/dev/null || echo 'MISSING')"
 echo "  ghq:     $(ghq --version 2>/dev/null || echo 'MISSING')"
 echo "  Claude:  $(claude --version 2>&1 || echo 'MISSING')"
 echo "  tmux:    $(tmux -V 2>/dev/null || echo 'MISSING')"
+echo "  LO:      $(libreoffice --version 2>/dev/null | head -1 || echo 'MISSING')"
+echo "  pandoc:  $(pandoc --version 2>/dev/null | head -1 || echo 'MISSING')"
+echo "  mmdc:    $(mmdc --version 2>/dev/null || echo 'MISSING')"
 echo ""
 echo "========================================"
 echo ""
