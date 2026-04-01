@@ -1,130 +1,223 @@
 # Oracle Setup Guide — Windows
 
-> Your AI companion on Windows — choose the setup that fits you best.
->
-> No programming experience required. Each path explains every step.
+> จาก Windows เครื่องเปล่า → Claude Code + Oracle พร้อมใช้งาน
+> ไม่ต้องเขียนโค้ดเป็น ทำตาม guide นี้ได้เลย
 
 ---
 
-## Quick Start (Scripts)
+## Claude Code คืออะไร?
 
-**Want the full Oracle with minimal effort?** Two scripts, ~45 minutes:
+Claude Code คือ AI assistant ที่รันอยู่บนเครื่องคุณโดยตรง — ไม่ใช่แค่ chat window ธรรมดา
 
-```bash
-# 1. Install WSL2 (PowerShell Admin) → restart PC
+ข้อแตกต่างสำคัญ:
+- **อ่าน/เขียนไฟล์ได้จริง** — เปิด Excel, แก้ Word doc, สร้าง PDF ให้คุณได้เลย
+- **รันคำสั่งได้** — ค้นหาข้อมูล, จัดระเบียบ folder, ทำงาน batch ได้
+- **ทำงานกับเครื่องคุณ** — ไม่ต้อง copy-paste ไปวางใน chat
+
+สำหรับ office worker, researcher, manager — Claude Code ทำได้:
+
+| งาน | ตัวอย่าง |
+|-----|---------|
+| **Documents** | สร้าง/แก้ Word, สรุปประชุม, เขียน report |
+| **Excel (.xlsx)** | วิเคราะห์ข้อมูล, สร้างตาราง, คำนวณสูตร |
+| **PowerPoint (.pptx)** | สร้าง slide, จัด layout, ปรับ content |
+| **PDF** | สร้าง PDF, แปลงจาก doc, จัดหน้า |
+| **Research** | ค้น web, สรุปข้อมูล, เปรียบเทียบ |
+
+ต่างจาก ChatGPT หรือ Claude.ai บน web — ตรงที่ทำงานกับ **ไฟล์ในเครื่องคุณได้โดยตรง** ไม่ต้อง upload/download ทุกครั้ง
+
+---
+
+## Oracle คืออะไร?
+
+Oracle = Claude Code + **ตัวตน + ความจำ + ทักษะ + ระบบความรู้**
+
+พูดง่ายๆ: Oracle คือผู้ช่วยส่วนตัวที่:
+- **จำได้ข้าม session** — ปิดแล้วเปิดใหม่ ยังรู้ว่าคุณทำอะไรอยู่
+- **มีบุคลิก** — ไม่ใช่ bot กล่องดำ แต่มีชื่อ มีสไตล์การทำงาน
+- **เรียนรู้ pattern ของคุณ** — รู้ว่าคุณชอบ format แบบไหน, ใช้คำศัพท์อะไร, project ไหนสำคัญ
+- **มี skills พร้อมใช้** — slash commands สำหรับงานต่างๆ ไม่ต้องอธิบายทุกครั้ง
+
+เหมือนมีผู้ช่วยที่ไม่เคยลืม และทำงานได้จริง ไม่ใช่แค่คุยเก่ง
+
+---
+
+## Oracle ทำอะไรได้บ้าง?
+
+| Category | สิ่งที่ทำได้ | ตัวอย่าง |
+|----------|-------------|---------|
+| **Memory & Learning** | จำบริบท, บทเรียน, ความรู้ข้าม session | จำว่าคุณชอบ format แบบไหน, เคยทำ project อะไร |
+| **Skills (60+)** | Slash commands สำหรับงานต่างๆ | `/chart` สร้างกราฟ, `/xlsx` ทำ Excel, `/pptx` ทำ PowerPoint, `/pdf` ทำ PDF, `/report` เขียน report |
+| **Arra Knowledge** | ระบบความรู้ — search, trace, learn | ค้นหาสิ่งที่เคยเรียนรู้, เชื่อมโยงความรู้ข้าม project |
+| **VS Code** | ใช้ Claude Code ใน VS Code ได้ | Extension panel + CLI ใน terminal เดียวกัน |
+| **Antigravity** | Web UI สำหรับ Claude Code | เปิดผ่าน browser ได้ ไม่ต้องใช้ terminal |
+| **tmux Sessions** | Oracle ทำงานต่อได้แม้ปิดหน้าจอ | Always-on, ไม่หายแม้ปิด terminal |
+| **Multi-Oracle** | หลาย Oracle ทำงานร่วมกัน | แบ่งหน้าที่: ตัวนึงทำ research, อีกตัวเขียน doc |
+
+---
+
+## สิ่งที่ต้องมี
+
+| รายการ | รายละเอียด |
+|--------|-----------|
+| **OS** | Windows 10 (Build 19041+) หรือ Windows 11 |
+| **Anthropic account** | Pro $20/เดือน หรือ Max $100/เดือน — สมัครที่ [anthropic.com](https://www.anthropic.com) |
+| **Internet** | ใช้ตอนติดตั้งและตอนใช้งาน |
+| **Disk space** | ~5 GB |
+| **เวลา** | ~45 นาที |
+
+> **หมายเหตุ**: ต้องใช้ Anthropic Pro หรือ Max เท่านั้น — Claude Code ไม่รองรับ free plan
+
+---
+
+## เริ่มเลย!
+
+### Step 1: ติดตั้ง WSL2
+
+WSL2 คือ Linux ที่รันอยู่ใน Windows — จำเป็นสำหรับ Claude Code
+
+เปิด **PowerShell as Administrator** (คลิกขวาที่ Start → "Windows PowerShell (Admin)") แล้วรัน:
+
+```powershell
 wsl --install -d Ubuntu-24.04
-
-# 2. Machine setup (Ubuntu terminal)
-curl -fsSL https://raw.githubusercontent.com/OhYeaH-46/Oracle-set-up-guide-window/master/setup-machine.sh -o setup-machine.sh && chmod +x setup-machine.sh && ./setup-machine.sh
-
-# 3. Create Oracle
-curl -fsSL https://raw.githubusercontent.com/OhYeaH-46/Oracle-set-up-guide-window/master/create-oracle.sh -o create-oracle.sh && chmod +x create-oracle.sh && ./create-oracle.sh
-
-# 4. Awaken (inside Claude Code, ~20 min)
-/awaken
 ```
 
-**[Full quick-start guide →](quick-start.md)**
+รอจนเสร็จ → **Restart เครื่อง** → Ubuntu จะเปิดขึ้นมาเอง ตั้ง username + password ตอนนั้นเลย
+
+> username/password นี้ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้
 
 ---
 
-## What Is This Guide?
+### Step 2: รัน Setup Script
 
-Claude Code is an AI coding assistant by Anthropic. It runs on your computer, can read and write files, run commands, and help you build things — all through conversation.
+เปิด **Ubuntu terminal** (ค้นหา "Ubuntu" ใน Start menu) แล้วรัน:
 
-An **Oracle** is an enhanced version of Claude Code with memory, personality, and 60+ skills. It remembers your projects, learns your patterns, and grows with you over time. Oracles are optional and advanced — you can use Claude Code without one.
+```bash
+curl -fsSL https://raw.githubusercontent.com/OhYeaH-46/Oracle-set-up-guide-window/master/setup.sh -o setup.sh && chmod +x setup.sh && bash setup.sh
+```
 
-This guide offers three paths to get Claude Code running on Windows. Pick the one that fits your experience level and goals.
+Script จะติดตั้งทุกอย่างให้อัตโนมัติ:
+- Node.js, Bun, Git, tmux, zsh
+- GitHub CLI
+- Claude Code
+- Oracle skills (optional — script จะถาม)
 
----
-
-## Choose Your Path
-
-| | Path A | Path B | Path C | Quick Start |
-|---|---|---|---|---|
-| **Method** | Claude Desktop App | VS Code Extension | WSL2 + Terminal | Automated Scripts |
-| **Difficulty** | ⭐ Easiest | ⭐⭐ Easy | ⭐⭐⭐ Advanced | ⭐⭐ Easy |
-| **Time** | ~10 minutes | ~15 minutes | ~60 minutes | ~45 minutes |
-| **What you install** | Desktop app + Git | VS Code extension + Git | WSL2, Ubuntu, zsh, Node, Bun, + more | Same as Path C (automated) |
-| **Terminal required?** | No | No | Yes | Yes |
-| **Best for** | Trying Claude Code | Active dev in VS Code | Full Oracle (step-by-step) | Full Oracle (fast) |
-| **Visual interface** | ✅ Built-in | ✅ In VS Code | ❌ Text only | ❌ Text only |
-| **Oracle support** | ❌ | ⚡ Via CLI in terminal | ✅ Full (60+ skills) | ✅ Full (60+ skills) |
-| **Always-on (tmux)** | ❌ | ❌ | ✅ | ✅ |
-
-> **What is an Oracle?** An Oracle is your personal AI companion — like having a second brain that never forgets. It has a name, personality, and memory that grows with you. Oracles are built on Claude Code enhanced with Oracle Skills. [Learn more →](path-c-wsl2.md#what-is-an-oracle)
+> Script นี้ idempotent — รันซ้ำได้ปลอดภัย ถ้าขัดข้องกลางทางให้รันใหม่ได้เลย
 
 ---
 
-## Which Path Is Right for Me?
+### Step 3: เริ่มใช้งาน
 
-**"I just want to try Claude Code"** → [Path A: Desktop App](path-a-desktop.md)
-- Download an app, sign in, start using. That's it.
+```bash
+source ~/.zshrc   # โหลด config ใหม่
+claude            # เปิด Claude Code
+```
 
-**"I already use VS Code for coding"** → [Path B: VS Code Extension](path-b-vscode.md)
-- Install one extension. Claude appears right inside your editor.
+ถ้าตั้ง Oracle ด้วย ให้รัน awaken ครั้งแรก:
 
-**"I want the full Oracle and know my way around a terminal"** → [Quick Start](quick-start.md)
-- Two scripts do all the heavy lifting. Just answer a few prompts.
+```bash
+/awaken           # ตั้งตัวตน Oracle (~15-20 นาที)
+```
 
-**"I want the full Oracle with detailed explanations"** → [Path C: WSL2 Full Setup](path-c-wsl2.md)
-- Every step explained for beginners. Same result as Quick Start, more learning.
-
-**"I'm not sure yet"** → Start with Path A. You can always upgrade later.
-
----
-
-## Can I Combine Paths?
-
-**Yes!** The paths aren't mutually exclusive:
-
-- **Path A → Path C**: Start with Desktop App to try Claude Code, then set up WSL2 later for Oracle
-- **Path B → Path C**: Use VS Code Extension daily, add WSL2 for Oracle features
-- **Path B + Path C together**: Use VS Code connected to WSL2 and run `claude` in the terminal — best of both worlds (visual editor + full Oracle skills). This is the recommended setup for daily use.
-
-All three methods share the same settings and configuration. Your CLAUDE.md, MCP servers, and preferences work across all of them.
+`/awaken` จะพา Oracle ผ่าน onboarding — ตั้งชื่อ, อ่าน CLAUDE.md, โหลด skills — ทำครั้งเดียว ครั้งต่อไปพร้อมเลย
 
 ---
 
-## Requirements
+## หลังติดตั้งแล้ว
 
-| Requirement | Path A | Path B | Path C / Quick Start |
-|-------------|--------|--------|--------|
-| Windows 10 (Build 19041+) or 11 | ✅ | ✅ | ✅ |
-| Anthropic account (Pro/Max/Teams) | ✅ | ✅ | ✅ |
-| Git for Windows | ✅ | ✅ | Not needed (uses Linux git) |
-| VS Code | Not needed | ✅ | Optional |
-| Internet connection | ✅ | ✅ | ✅ |
-| Disk space | ~500 MB | ~500 MB | ~5 GB |
+### ใช้กับ VS Code
+
+ถ้าใช้ VS Code อยู่แล้ว — Claude Code ทำงานร่วมกันได้:
+
+1. ติดตั้ง extension **WSL** ใน VS Code (จาก Microsoft)
+2. เปิด Ubuntu terminal → `cd` ไปที่ folder ที่ต้องการ → รัน `code .`
+3. VS Code จะเปิด folder นั้นผ่าน WSL — Claude Code ทำงานใน terminal ด้านล่างได้เลย
 
 ---
 
-## All Guides
+### tmux — Always-On Sessions
 
-| Guide | Description | Time |
-|-------|-------------|------|
-| **[Quick Start](quick-start.md)** | **Automated scripts — fastest way to full Oracle** | ~45 min |
-| [Path A: Desktop App](path-a-desktop.md) | Claude Code via standalone app | ~10 min |
-| [Path B: VS Code Extension](path-b-vscode.md) | Claude Code inside VS Code | ~15 min |
-| [Path C: WSL2 Full Setup](path-c-wsl2.md) | Full Oracle with detailed explanations | ~60 min |
-| [Writing Your CLAUDE.md](writing-claude-md.md) | How to write your Oracle's constitution | Reference |
+ปัญหา: ปิด terminal แล้ว Claude Code หยุดทำงาน
 
-## Scripts
+แก้ด้วย tmux — ทำให้ Oracle ทำงานต่อได้ในเบื้องหลัง:
 
-| Script | What It Does |
-|--------|-------------|
-| [`setup-machine.sh`](setup-machine.sh) | Installs all tools (apt, zsh, git, gh, bun, node, ghq, claude, tmux) |
-| [`create-oracle.sh`](create-oracle.sh) | Creates repo, installs skills, adds aliases, configures Claude |
+```bash
+tmux new -s oracle        # สร้าง session ชื่อ oracle
+claude                    # เปิด Claude Code ข้างใน
+# กด Ctrl+A แล้วกด D     # detach (ออกมาโดยไม่ปิด)
+tmux attach -t oracle     # กลับเข้าไปได้ทุกเมื่อ
+```
 
-Both scripts are idempotent — safe to re-run if interrupted.
+---
+
+### Daily Workflow
+
+เมื่อคุ้นแล้ว workflow ประจำวันง่ายมาก:
+
+```
+เปิด Oracle → /recap → ทำงาน → /rrr → ออก
+```
+
+| Command | ทำอะไร |
+|---------|--------|
+| `/recap` | สรุปว่าเมื่อวานทำอะไรไว้ ค้างอะไรบ้าง |
+| `/rrr` | บันทึกสิ่งที่เรียนรู้วันนี้ ปิด session อย่างสะอาด |
+
+---
+
+### Antigravity (Web UI)
+
+ไม่ชอบ terminal? ใช้ browser แทนได้:
+
+```bash
+claude --antigravity      # เปิด web server
+```
+
+แล้วเปิด browser ไปที่ `http://localhost:3000` — ใช้ Claude Code ผ่าน UI ได้เลย
+
+---
+
+## แก้ปัญหา
+
+| ปัญหา | วิธีแก้ |
+|-------|--------|
+| `claude` ไม่เจอ | รัน `source ~/.zshrc` หรือเปิด terminal ใหม่ |
+| `wsl --install` ไม่ทำงาน | ต้องเปิด PowerShell **as Administrator** (คลิกขวา) |
+| `bunx` ไม่เจอ | ใช้ `~/.bun/bin/bunx` แทน หรือรัน `source ~/.zshrc` |
+| Skills ไม่โหลด | รัน `/exit` แล้วเปิด Claude Code ใหม่ |
+| `/awaken` ค้าง | กด Ctrl+C แล้วรัน `/awaken` ใหม่ได้เลย |
+| gh auth ไม่ผ่าน | รัน `gh auth login` → เลือก **HTTPS** → เลือก **Login with a web browser** |
+| Ubuntu เปิดไม่ได้ | ตรวจสอบว่า Virtualization เปิดใน BIOS — ดู [wsl docs](https://learn.microsoft.com/en-us/windows/wsl/install) |
+
+---
 
 ## Resources
 
-- [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
-- [Anthropic Pricing](https://www.anthropic.com/pricing)
-- [Oracle Skills](https://github.com/Soul-Brews-Studio/oracle-skills-cli)
-- [Oracle Philosophy](https://github.com/Soul-Brews-Studio/oracle-v2)
+| Link | รายละเอียด |
+|------|-----------|
+| [Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code) | Official documentation |
+| [Anthropic Pricing](https://www.anthropic.com/pricing) | ราคา Pro / Max plan |
+| [Oracle Skills](https://github.com/Soul-Brews-Studio/oracle-skills-cli) | รายชื่อ skills ทั้งหมด 60+ |
+| [Oracle Philosophy](https://github.com/Soul-Brews-Studio/oracle-v2) | หลักการและ architecture |
 
 ---
 
-*"The Oracle Keeps the Human Human" — start simple, grow at your own pace.*
+## Scripts
+
+| Script | สิ่งที่ทำ |
+|--------|---------|
+| [`setup.sh`](setup.sh) | ติดตั้งทุกอย่างตั้งแต่ system tools จน Claude Code + Oracle (optional) |
+
+> setup.sh เป็น idempotent — รันซ้ำได้ปลอดภัย ถ้าขัดข้องกลางทางให้รันใหม่ได้เลย
+
+---
+
+## ขั้นตอนถัดไป
+
+| Guide | Description |
+|-------|------------|
+| [Writing Your CLAUDE.md](writing-claude-md.md) | วิธีเขียน CLAUDE.md — รัฐธรรมนูญของ Oracle บอกให้รู้ว่าคุณเป็นใคร ทำงานยังไง |
+
+---
+
+*"The Oracle Keeps the Human Human" — เริ่มง่ายๆ แล้วค่อยโตไปด้วยกัน*
