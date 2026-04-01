@@ -85,19 +85,20 @@ wsl --install -d Ubuntu-24.04
 
 รอจนเสร็จ → **Restart เครื่อง**
 
-หลัง restart → เปิด **PowerShell** อีกครั้ง แล้วรัน **คำสั่งเดิม**:
-
-```powershell
-wsl --install -d Ubuntu-24.04
-```
-
-> 💡 **ทำไมต้องรันสองครั้ง?**
-> ครั้งแรก Windows เปิด WSL feature (ต้อง restart)
-> ครั้งที่สอง ติดตั้ง Ubuntu จริง — ถ้า Ubuntu ติดตั้งไปแล้วจะเปิดขึ้นมาเลย ไม่ติดตั้งซ้ำ
+หลัง restart → **เปิด Ubuntu** จาก Start menu (พิมพ์ "Ubuntu" แล้วกด Enter)
 
 Ubuntu จะเปิดขึ้นมา → ตั้ง **username + password** (ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้)
 
-> ⚠️ **ยังไม่ได้?** ดู [แก้ปัญหา](#แก้ปัญหา) ด้านล่าง
+> ⚠️ **หา Ubuntu ไม่เจอใน Start menu?**
+>
+> บางเครื่อง `wsl --install` แค่เปิด WSL feature แต่ยังไม่ได้ลง Ubuntu
+> เปิด **PowerShell** แล้วรัน:
+> ```powershell
+> wsl --install --web-download -d Ubuntu-24.04
+> ```
+> `--web-download` ดาวน์โหลด Ubuntu ตรงจาก server — แก้ปัญหา install ค้างหรือไม่สมบูรณ์ได้
+>
+> ถ้ายังไม่ได้ → ดู [แก้ปัญหา](#แก้ปัญหา) ด้านล่าง
 
 ---
 
@@ -196,7 +197,8 @@ claude --antigravity      # เปิด web server
 |-------|--------|
 | `claude` ไม่เจอ | รัน `source ~/.zshrc` หรือเปิด terminal ใหม่ |
 | `wsl --install` ไม่ทำงาน | ต้องเปิด PowerShell **as Administrator** (คลิกขวา) |
-| Ubuntu ไม่เปิดหลัง restart | รัน `wsl --install -d Ubuntu-24.04` อีกครั้งใน PowerShell (รันซ้ำได้ปลอดภัย) |
+| Ubuntu ไม่เจอใน Start menu | รัน `wsl --install --web-download -d Ubuntu-24.04` ใน PowerShell |
+| Install ค้างที่ 0.0% | ใช้ `wsl --install --web-download -d Ubuntu-24.04` (ดาวน์โหลดตรงจาก server) |
 | Ubuntu เปิดแล้วปิดทันที | รัน `wsl --update` ใน PowerShell ก่อน แล้วเปิด Ubuntu ใหม่ |
 | Error 0x80370102 | เปิด Virtualization ใน BIOS + เปิด "Virtual Machine Platform" ใน Windows Features |
 | Ubuntu เปิดไม่ได้เลย | ดู [WSL troubleshooting](https://learn.microsoft.com/en-us/windows/wsl/troubleshooting) |
