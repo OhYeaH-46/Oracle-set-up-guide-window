@@ -76,15 +76,26 @@ Oracle = Claude Code + **ตัวตน + ความจำ + ทักษะ 
 
 WSL2 คือ Linux ที่รันอยู่ใน Windows — จำเป็นสำหรับ Claude Code
 
-เปิด **PowerShell as Administrator** (คลิกขวาที่ Start → "Windows PowerShell (Admin)") แล้วรัน:
+เปิด **PowerShell as Administrator** (คลิกขวาที่ Start → "Windows PowerShell (Admin)") แล้วรันทีละบรรทัด:
 
 ```powershell
+wsl --update
 wsl --install -d Ubuntu-24.04
 ```
 
-รอจนเสร็จ → **Restart เครื่อง** → Ubuntu จะเปิดขึ้นมาเอง ตั้ง username + password ตอนนั้นเลย
+รอจนเสร็จ → **Restart เครื่อง**
 
-> username/password นี้ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้
+> ⚠️ **Ubuntu ไม่เปิดเองหลัง restart?** — เป็นเรื่องปกติ ทำตามนี้:
+>
+> 1. เปิด **PowerShell** (ไม่ต้อง Admin) แล้วรัน:
+>    ```powershell
+>    wsl --install -d Ubuntu-24.04
+>    ```
+>    (รันซ้ำได้ปลอดภัย — ถ้าติดตั้งแล้วจะเปิด Ubuntu ให้เลย)
+> 2. ถ้ายังไม่ได้ → ค้นหา "Ubuntu" ใน Start menu แล้วเปิดเอง
+> 3. ถ้าเจอ error → รัน `wsl --update` ใน PowerShell ก่อน แล้วลองใหม่
+
+ตอน Ubuntu เปิดครั้งแรก → ตั้ง **username + password** (ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้)
 
 ---
 
@@ -183,11 +194,14 @@ claude --antigravity      # เปิด web server
 |-------|--------|
 | `claude` ไม่เจอ | รัน `source ~/.zshrc` หรือเปิด terminal ใหม่ |
 | `wsl --install` ไม่ทำงาน | ต้องเปิด PowerShell **as Administrator** (คลิกขวา) |
+| Ubuntu ไม่เปิดหลัง restart | รัน `wsl --install -d Ubuntu-24.04` อีกครั้งใน PowerShell (รันซ้ำได้ปลอดภัย) |
+| Ubuntu เปิดแล้วปิดทันที | รัน `wsl --update` ใน PowerShell ก่อน แล้วเปิด Ubuntu ใหม่ |
+| Error 0x80370102 | เปิด Virtualization ใน BIOS + เปิด "Virtual Machine Platform" ใน Windows Features |
+| Ubuntu เปิดไม่ได้เลย | ดู [WSL troubleshooting](https://learn.microsoft.com/en-us/windows/wsl/troubleshooting) |
 | `bunx` ไม่เจอ | ใช้ `~/.bun/bin/bunx` แทน หรือรัน `source ~/.zshrc` |
 | Skills ไม่โหลด | รัน `/exit` แล้วเปิด Claude Code ใหม่ |
 | `/awaken` ค้าง | กด Ctrl+C แล้วรัน `/awaken` ใหม่ได้เลย |
 | gh auth ไม่ผ่าน | รัน `gh auth login` → เลือก **HTTPS** → เลือก **Login with a web browser** |
-| Ubuntu เปิดไม่ได้ | ตรวจสอบว่า Virtualization เปิดใน BIOS — ดู [wsl docs](https://learn.microsoft.com/en-us/windows/wsl/install) |
 
 ---
 
