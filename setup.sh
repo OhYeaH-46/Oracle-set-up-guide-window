@@ -559,7 +559,7 @@ fi
 printf '%s • ' "$now"
 printf '%b%s%%(%sk/%sk)%b' "$ctx_color" "$pct" "$used_k" "$max_k" "$reset"
 total=$((total_in + total_out))
-[ "$total" -gt 0 ] && printf ' t:%sk' "$((total / 1000))"
+[ "$total" -gt 0 ] && printf ' t:%s' "$(printf '%d' "$total" | sed ':a;s/\B[0-9]\{3\}$/,&/;ta')"
 printf ' • %s' "$display_dir"
 [ -n "$branch" ] && printf ' %s' "$branch"
 printf ' • %b%s%b' "$model_color" "$model" "$reset"
