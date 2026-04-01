@@ -76,7 +76,7 @@ Oracle = Claude Code + **ตัวตน + ความจำ + ทักษะ 
 
 WSL2 คือ Linux ที่รันอยู่ใน Windows — จำเป็นสำหรับ Claude Code
 
-เปิด **PowerShell as Administrator** (คลิกขวาที่ Start → "Windows PowerShell (Admin)") แล้วรันทีละบรรทัด:
+เปิด **PowerShell as Administrator** (คลิกขวาที่ Start → "Windows PowerShell (Admin)") แล้วรัน:
 
 ```powershell
 wsl --update
@@ -85,13 +85,19 @@ wsl --install -d Ubuntu-24.04
 
 รอจนเสร็จ → **Restart เครื่อง**
 
-หลัง restart → เปิด **Ubuntu** จาก Start menu (พิมพ์ "Ubuntu" แล้วกด Enter)
+หลัง restart → เปิด **PowerShell** อีกครั้ง แล้วรัน **คำสั่งเดิม**:
 
-> ⚠️ **หา Ubuntu ไม่เจอใน Start menu?**
-> เปิด PowerShell แล้วรัน `wsl` — ถ้าขึ้น error ให้รัน `wsl --update` แล้ว restart อีกครั้ง
-> ถ้าเจอ Error 0x80370102 → ต้องเปิด Virtualization ใน BIOS (ดู [วิธีแก้](#แก้ปัญหา))
+```powershell
+wsl --install -d Ubuntu-24.04
+```
 
-ตอน Ubuntu เปิดครั้งแรก → ตั้ง **username + password** (ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้)
+> 💡 **ทำไมต้องรันสองครั้ง?**
+> ครั้งแรก Windows เปิด WSL feature (ต้อง restart)
+> ครั้งที่สอง ติดตั้ง Ubuntu จริง — ถ้า Ubuntu ติดตั้งไปแล้วจะเปิดขึ้นมาเลย ไม่ติดตั้งซ้ำ
+
+Ubuntu จะเปิดขึ้นมา → ตั้ง **username + password** (ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้)
+
+> ⚠️ **ยังไม่ได้?** ดู [แก้ปัญหา](#แก้ปัญหา) ด้านล่าง
 
 ---
 
