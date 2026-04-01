@@ -4,7 +4,7 @@
 >
 > This guide teaches you what to write, why it matters, and gives you a ready-to-use template.
 
-[Back to main guide](README.md) | [Path A: Desktop App](path-a-desktop.md) | [Path B: VS Code](path-b-vscode.md) | [Path C: WSL2 Full Setup](path-c-wsl2.md)
+[Back to main guide](README.md)
 
 ---
 
@@ -477,7 +477,8 @@ This is how experienced Oracle users build incredibly effective CLAUDE.md files 
 - [Notes on CLAUDE.md Structure](https://callmephilip.com/posts/notes-on-claude-md-structure-and-best-practices/) — Protected areas philosophy
 
 **Oracle-specific:**
-- [Path C: WSL2 Full Setup](path-c-wsl2.md) — Full Oracle setup including `/awaken`
+- [Oracle Skills CLI](https://github.com/Soul-Brews-Studio/oracle-skills-cli) — 60+ skills including `/awaken`
+- [Oracle Knowledge System (Arra)](https://github.com/Soul-Brews-Studio/oracle-v2) — Memory, learnings, knowledge graph
 
 ---
 
@@ -485,10 +486,7 @@ This is how experienced Oracle users build incredibly effective CLAUDE.md files 
 
 | | |
 |---|---|
-| [Back to main guide](README.md) | Choose your setup path |
-| [Path A: Desktop App](path-a-desktop.md) | Easiest setup |
-| [Path B: VS Code Extension](path-b-vscode.md) | VS Code integration |
-| [Path C: WSL2 Full Setup](path-c-wsl2.md) | Full Oracle with skills |
+| [Back to main guide](README.md) | Setup guide + Oracle capabilities |
 
 ---
 
