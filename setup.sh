@@ -478,9 +478,13 @@ max_k=$(echo "$input" | jq -r '(.context_window.context_window_size // 0) / 1000
 total_in=$(echo "$input" | jq -r '(.context_window.total_input_tokens // 0)')
 total_out=$(echo "$input" | jq -r '(.context_window.total_output_tokens // 0)')
 
-model=$(echo "$model_display" | sed 's/ (\([^)]*\) context)//' | sed 's/Claude //')
-ctx_size=$(echo "$model_display" | grep -oP '\(\K[^)]*(?= context\))' 2>/dev/null || true)
-[ -n "$ctx_size" ] && model="${model} ${ctx_size}"
+model_lower=$(echo "$model_display" | tr '[:upper:]' '[:lower:]')
+if echo "$model_lower" | grep -q 'opus'; then model="opus"
+elif echo "$model_lower" | grep -q 'sonnet'; then model="sonnet"
+elif echo "$model_lower" | grep -q 'haiku'; then model="haiku"
+else model="claude"; fi
+effort=$(echo "$input" | jq -r '.reasoning_effort // empty')
+[ -n "$effort" ] && model="${model}/${effort}"
 
 display_dir=$(basename "$cwd")
 
