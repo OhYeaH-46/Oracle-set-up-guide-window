@@ -466,12 +466,10 @@ if [ ! -f "$STATUSLINE_SCRIPT" ]; then
   mkdir -p "${HOME}/.claude"
   cat > "$STATUSLINE_SCRIPT" <<'STATUSLINE'
 #!/bin/bash
-# Claude Code status line — context, tokens, branch, model, rate limits
-# Based on OhYeaH! Oracle status line with rate limits from Milky-dot
+# Claude Code status line — context, tokens, branch, model, rate limits + countdown
 
 input=$(cat)
 
-# --- Extract JSON data ---
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // "~"')
 model_display=$(echo "$input" | jq -r '.model.display_name // .model.id // "Claude"')
 pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
@@ -480,22 +478,12 @@ max_k=$(echo "$input" | jq -r '(.context_window.context_window_size // 0) / 1000
 total_in=$(echo "$input" | jq -r '(.context_window.total_input_tokens // 0)')
 total_out=$(echo "$input" | jq -r '(.context_window.total_output_tokens // 0)')
 
-# --- Model label: "Opus 4.6 1M" ---
 model=$(echo "$model_display" | sed 's/ (\([^)]*\) context)//' | sed 's/Claude //')
 ctx_size=$(echo "$model_display" | grep -oP '\(\K[^)]*(?= context\))' 2>/dev/null || true)
 [ -n "$ctx_size" ] && model="${model} ${ctx_size}"
 
-# --- Short directory (last 2 segments) ---
-if [[ "$cwd" == "$HOME"* ]]; then
-  display_dir="${cwd/#$HOME/~}"
-else
-  display_dir="$cwd"
-fi
-if [ "${#display_dir}" -gt 30 ]; then
-  display_dir="…/$(echo "$display_dir" | rev | cut -d/ -f1-2 | rev)"
-fi
+display_dir=$(basename "$cwd")
 
-# --- Git branch (no-lock to avoid blocking) + dirty marker ---
 branch=""
 if git -C "$cwd" --no-optional-locks rev-parse --git-dir >/dev/null 2>&1; then
   branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null \
@@ -505,13 +493,9 @@ if git -C "$cwd" --no-optional-locks rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
-# --- Tmux session name ---
 tmux_session=""
-if [ -n "$TMUX" ]; then
-  tmux_session=$(tmux display-message -p '#S' 2>/dev/null)
-fi
+[ -n "$TMUX" ] && tmux_session=$(tmux display-message -p '#S' 2>/dev/null)
 
-# --- Auto-compact adjustment ---
 compact_val=$(jq -r 'if .autoCompactEnabled == false then "false" else "true" end' ~/.claude.json 2>/dev/null)
 compact_pct=${CLAUDE_AUTOCOMPACT_PCT_OVERRIDE:-80}
 if [ "$compact_val" != "false" ] && [ "$max_k" -gt 0 ]; then
@@ -519,56 +503,57 @@ if [ "$compact_val" != "false" ] && [ "$max_k" -gt 0 ]; then
   pct=$((used_k * 100 / max_k))
 fi
 
-# --- Context color: green <50%, yellow 50-79%, red >=80% ---
 if [ "$pct" -ge 80 ]; then ctx_color="\033[31m"
 elif [ "$pct" -ge 50 ]; then ctx_color="\033[33m"
 else ctx_color="\033[32m"; fi
 
-# --- Rate limits (color-coded) ---
+reset="\033[0m"
+model_color="\033[36m"
+session_color="\033[35m"
+now=$(date '+%m/%d %H:%M')
+
+# Rate limits + countdown
 rl_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+rl_5h_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 rl_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+rl_7d_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
+now_epoch=$(date +%s)
+
+countdown() {
+  local resets_at="$1"
+  if [ -n "$resets_at" ] && [ "$resets_at" -gt "$now_epoch" ] 2>/dev/null; then
+    local remain=$((resets_at - now_epoch))
+    local h=$((remain / 3600)); local m=$(( (remain % 3600) / 60 ))
+    printf '⏐%dh%02dm' "$h" "$m"
+  fi
+}
 
 rate_str=""
 if [ -n "$rl_5h" ] || [ -n "$rl_7d" ]; then
   if [ -n "$rl_5h" ]; then
     rl5i=$(printf "%.0f" "$rl_5h")
     if [ "$rl5i" -lt 50 ]; then rl5c="\033[32m"; elif [ "$rl5i" -lt 80 ]; then rl5c="\033[33m"; else rl5c="\033[31m"; fi
-    rl5="${rl5c}5h:${rl5i}%\033[0m"
+    rl5="${rl5c}5h:${rl5i}%$(countdown "$rl_5h_reset")${reset}"
   else rl5="5h:-"; fi
-
   if [ -n "$rl_7d" ]; then
     rl7i=$(printf "%.0f" "$rl_7d")
     if [ "$rl7i" -lt 50 ]; then rl7c="\033[32m"; elif [ "$rl7i" -lt 80 ]; then rl7c="\033[33m"; else rl7c="\033[31m"; fi
-    rl7="${rl7c}7d:${rl7i}%\033[0m"
+    rl7="${rl7c}7d:${rl7i}%$(countdown "$rl_7d_reset")${reset}"
   else rl7="7d:-"; fi
-
-  rate_str=" • limit[${rl5} ${rl7}]"
+  rate_str=" • ${rl5} ${rl7}"
 fi
 
-# --- Assemble output ---
-reset="\033[0m"
-model_color="\033[36m"
-session_color="\033[35m"
-now=$(date '+%H:%M')
-
-if [ "$compact_val" != "false" ]; then ac="ac:on"; else ac="ac:off"; fi
-
-# Format tokens with commas
-total=$((total_in + total_out))
-tokens_fmt=$(printf '%d' "$total" | sed ':a;s/\B[0-9]\{3\}$/,&/;ta')
-
-# [session] time • ctx% (used/max) [tokens] • dir branch • model • ac • limit
+# Output
 if [ -n "$tmux_session" ]; then
   printf '%b[%s]%b ' "$session_color" "$tmux_session" "$reset"
 fi
-printf '%s' "$now"
-printf ' • '
-printf '%b%s%% (%sk/%sk)%b' "$ctx_color" "$pct" "$used_k" "$max_k" "$reset"
-[ "$total" -gt 0 ] && printf ' [%s tokens]' "$tokens_fmt"
+printf '%s • ' "$now"
+printf '%b%s%%(%sk/%sk)%b' "$ctx_color" "$pct" "$used_k" "$max_k" "$reset"
+total=$((total_in + total_out))
+[ "$total" -gt 0 ] && printf ' t:%sk' "$((total / 1000))"
 printf ' • %s' "$display_dir"
-[ -n "$branch" ] && printf '  %s' "$branch"
+[ -n "$branch" ] && printf ' %s' "$branch"
 printf ' • %b%s%b' "$model_color" "$model" "$reset"
-printf ' • %s' "$ac"
 printf '%b' "$rate_str"
 STATUSLINE
   chmod +x "$STATUSLINE_SCRIPT"
