@@ -245,6 +245,38 @@ else
   warn "fnm ยังไม่พร้อมใน session นี้ — Node.js จะพร้อมหลัง restart terminal"
 fi
 
+# ─── 4.5 Document & Creative Tools (npm globals) ────────────────────────────
+section "4.5 Document & Creative Tools (npm)"
+
+if has npm; then
+  info "ติดตั้ง npm packages สำหรับสร้าง documents..."
+
+  # pptxgenjs — สร้าง PowerPoint
+  npm list -g pptxgenjs &>/dev/null || npm install -g pptxgenjs
+  # docx — สร้าง Word (.docx)
+  npm list -g docx &>/dev/null || npm install -g docx
+  # sharp — resize/แปลงรูป (เร็วกว่า imagemagick)
+  npm list -g sharp &>/dev/null || npm install -g sharp
+
+  success "npm document packages พร้อมแล้ว (pptxgenjs, docx, sharp)"
+else
+  warn "npm ยังไม่พร้อม — จะติดตั้ง document packages หลัง restart terminal"
+fi
+
+if has bun || [ -f "${HOME}/.bun/bin/bun" ]; then
+  info "ติดตั้ง bun packages..."
+  BUN="${HOME}/.bun/bin/bun"
+
+  # mermaid-cli — สร้าง diagram
+  [ -d "${HOME}/.bun/install/global/node_modules/@mermaid-js" ] || "$BUN" install -g @mermaid-js/mermaid-cli 2>/dev/null
+  # puppeteer — browser automation, HTML→PDF
+  [ -d "${HOME}/.bun/install/global/node_modules/puppeteer" ] || "$BUN" install -g puppeteer 2>/dev/null
+
+  success "bun packages พร้อมแล้ว (mermaid-cli, puppeteer)"
+else
+  warn "bun ยังไม่พร้อม — จะติดตั้ง packages หลัง restart terminal"
+fi
+
 # ─── 5. GitHub CLI ───────────────────────────────────────────────────────────
 section "5/10 GitHub CLI (gh)"
 
