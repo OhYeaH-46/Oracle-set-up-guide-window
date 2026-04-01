@@ -524,7 +524,12 @@ countdown() {
   if [ -n "$resets_at" ] && [ "$resets_at" -gt "$now_epoch" ] 2>/dev/null; then
     local remain=$((resets_at - now_epoch))
     local h=$((remain / 3600)); local m=$(( (remain % 3600) / 60 ))
-    printf '⏐%dh%02dm' "$h" "$m"
+    if [ "$h" -ge 24 ]; then
+      local d=$((h / 24)); h=$((h % 24))
+      printf '⏐%dd%dh%02dm' "$d" "$h" "$m"
+    else
+      printf '⏐%dh%02dm' "$h" "$m"
+    fi
   fi
 }
 
