@@ -302,7 +302,10 @@ GIT_EMAIL="$(git config --global user.email 2>/dev/null || true)"
 
 if [ -z "$GIT_NAME" ]; then
   echo ""
-  read -rp "ชื่อของคุณสำหรับ Git (เช่น Siwatch): " GIT_NAME
+  echo "Git ต้องการชื่อของคุณเพื่อบันทึกว่า \"ใครเป็นคนแก้ไฟล์นี้\""
+  echo "ใช้ชื่อจริง, ชื่อเล่น, หรือ GitHub username ก็ได้"
+  echo ""
+  read -rp "ชื่อของคุณ (เช่น Siwatch หรือ OhYeaH): " GIT_NAME
   git config --global user.name "$GIT_NAME"
   success "Git user.name = $GIT_NAME"
 else
@@ -310,7 +313,11 @@ else
 fi
 
 if [ -z "$GIT_EMAIL" ]; then
-  read -rp "Email GitHub ของคุณ: " GIT_EMAIL
+  echo ""
+  echo "Email สำหรับ Git — ใช้ email เดียวกับที่สมัคร GitHub"
+  echo "ถ้าไม่อยากเปิดเผย email จริง ใช้: username@users.noreply.github.com"
+  echo ""
+  read -rp "Email ของคุณ: " GIT_EMAIL
   git config --global user.email "$GIT_EMAIL"
   success "Git user.email = $GIT_EMAIL"
 else
