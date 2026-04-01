@@ -484,6 +484,7 @@ elif echo "$model_lower" | grep -q 'sonnet'; then model="sonnet"
 elif echo "$model_lower" | grep -q 'haiku'; then model="haiku"
 else model="claude"; fi
 effort=$(echo "$input" | jq -r '.reasoning_effort // empty')
+[ -z "$effort" ] && effort=$(jq -r '.effortLevel // empty' ~/.claude/settings.json 2>/dev/null)
 [ -n "$effort" ] && model="${model}/${effort}"
 
 display_dir=$(basename "$cwd")
