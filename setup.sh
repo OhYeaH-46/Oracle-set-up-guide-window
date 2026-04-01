@@ -63,6 +63,7 @@ echo "  7. Claude Code"
 echo "  8. Git config (name/email)"
 echo "  9. tmux config (Tokyo Night style)"
 echo " 10. PATH exports + gq function in .zshrc"
+echo " 11. Claude Code status line (context, tokens, rate limits)"
 echo ""
 echo -e "${YELLOW}หมายเหตุ: script นี้ idempotent — รันซ้ำได้ปลอดภัย${NC}"
 echo ""
@@ -407,6 +408,126 @@ if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
 fi'
 
 success ".zshrc exports & functions พร้อมแล้ว"
+
+# ─── 11. Claude Code Status Line ────────────────────────────────────────────
+section "11 Claude Code Status Line"
+
+STATUSLINE_SCRIPT="${HOME}/.claude/statusline-command.sh"
+
+if [ ! -f "$STATUSLINE_SCRIPT" ]; then
+  mkdir -p "${HOME}/.claude"
+  cat > "$STATUSLINE_SCRIPT" <<'STATUSLINE'
+#!/bin/sh
+# Claude Code status line — shows context, tokens, branch, model, rate limits
+
+input=$(cat)
+
+# --- Time ---
+time_str=$(date +%m/%d\ %H:%M)
+
+# --- Context window ---
+used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+ctx_window=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
+
+if [ -n "$used_pct" ] && [ "$ctx_window" -gt 0 ] 2>/dev/null; then
+  used_k=$(awk "BEGIN { printf \"%dk\", ($used_pct * $ctx_window / 100 / 1000) + 0.5 }")
+  total_k=$(awk "BEGIN { printf \"%dk\", ($ctx_window / 1000) + 0.5 }")
+  pct_int=$(printf "%.0f" "$used_pct")
+  if [ "$pct_int" -lt 40 ]; then
+    color="\033[32m"
+  elif [ "$pct_int" -lt 75 ]; then
+    color="\033[33m"
+  else
+    color="\033[31m"
+  fi
+  ctx_str="${color}context${pct_int}%(${used_k}/${total_k})\033[0m"
+else
+  ctx_str="context0%(-)"
+fi
+
+# --- Tokens used ---
+total_in=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+total_out=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+tokens_total=$((total_in + total_out))
+tokens_str="tokens:${tokens_total}"
+
+# --- Directory + git branch ---
+cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
+[ -z "$cwd" ] && cwd=$(pwd)
+dir_str=$(basename "$cwd")
+
+branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null \
+  || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
+if [ -n "$branch" ]; then
+  main_branch=$(git -C "$cwd" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+  [ -z "$main_branch" ] && main_branch="main"
+  dir_str="${dir_str} ${main_branch}/${branch}"
+fi
+
+# --- Model ---
+model_id=$(echo "$input" | jq -r '.model.id // .model.display_name // empty' | tr '[:upper:]' '[:lower:]')
+if echo "$model_id" | grep -qi 'opus'; then
+  short_model="opus"
+elif echo "$model_id" | grep -qi 'sonnet'; then
+  short_model="sonnet"
+elif echo "$model_id" | grep -qi 'haiku'; then
+  short_model="haiku"
+else
+  short_model="unknown"
+fi
+effort=$(echo "$input" | jq -r '.reasoning_effort // empty')
+[ -n "$effort" ] && short_model="${short_model}/${effort}"
+
+# --- Rate limits ---
+rl_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+rl_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+
+if [ -n "$rl_5h" ]; then
+  rl_5h_int=$(printf "%.0f" "$rl_5h")
+  if [ "$rl_5h_int" -lt 50 ]; then rl5c="\033[32m"; elif [ "$rl_5h_int" -lt 80 ]; then rl5c="\033[33m"; else rl5c="\033[31m"; fi
+  rl5_str="${rl5c}5h:${rl_5h_int}%\033[0m"
+else
+  rl5_str="5h:-"
+fi
+
+if [ -n "$rl_7d" ]; then
+  rl_7d_int=$(printf "%.0f" "$rl_7d")
+  if [ "$rl_7d_int" -lt 50 ]; then rl7c="\033[32m"; elif [ "$rl_7d_int" -lt 80 ]; then rl7c="\033[33m"; else rl7c="\033[31m"; fi
+  rl7_str="${rl7c}7d:${rl_7d_int}%\033[0m"
+else
+  rl7_str="7d:-"
+fi
+
+rate_str="limit[${rl5_str} ${rl7_str}]"
+
+# --- Output ---
+printf '%s | %b | %s | %s | %s | %b\n' "$time_str" "$ctx_str" "$tokens_str" "$dir_str" "$short_model" "$rate_str"
+STATUSLINE
+  chmod +x "$STATUSLINE_SCRIPT"
+  success "Status line script สร้างแล้ว"
+else
+  success "Status line script มีอยู่แล้ว (skip)"
+fi
+
+# Add statusLine to Claude Code settings
+CLAUDE_SETTINGS="${HOME}/.claude/settings.json"
+if [ -f "$CLAUDE_SETTINGS" ]; then
+  if ! grep -q 'statusLine' "$CLAUDE_SETTINGS" 2>/dev/null; then
+    # Add statusLine before the last closing brace
+    sed -i '$ s/}$/,\n  "statusLine": { "type": "command", "command": "bash '"$STATUSLINE_SCRIPT"'" }\n}/' "$CLAUDE_SETTINGS"
+    success "Status line เพิ่มใน settings.json แล้ว"
+  else
+    success "Status line มีใน settings.json อยู่แล้ว (skip)"
+  fi
+else
+  mkdir -p "${HOME}/.claude"
+  cat > "$CLAUDE_SETTINGS" <<SETTINGS
+{
+  "statusLine": { "type": "command", "command": "bash $STATUSLINE_SCRIPT" }
+}
+SETTINGS
+  success "สร้าง settings.json + status line แล้ว"
+fi
 
 # ─── Summary ──────────────────────────────────────────────────────────────────
 section "✅ Summary"
