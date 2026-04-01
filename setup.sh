@@ -263,19 +263,15 @@ else
   warn "npm ยังไม่พร้อม — จะติดตั้ง document packages หลัง restart terminal"
 fi
 
-if has bun || [ -f "${HOME}/.bun/bin/bun" ]; then
-  info "ติดตั้ง bun packages..."
-  BUN="${HOME}/.bun/bin/bun"
-
-  # mermaid-cli — สร้าง diagram
-  [ -d "${HOME}/.bun/install/global/node_modules/@mermaid-js" ] || "$BUN" install -g @mermaid-js/mermaid-cli 2>/dev/null
-  # puppeteer — browser automation, HTML→PDF
-  [ -d "${HOME}/.bun/install/global/node_modules/puppeteer" ] || "$BUN" install -g puppeteer 2>/dev/null
-
-  success "bun packages พร้อมแล้ว (mermaid-cli, puppeteer)"
-else
-  warn "bun ยังไม่พร้อม — จะติดตั้ง packages หลัง restart terminal"
-fi
+# Python packages for Anthropic skills (docx, pptx, pdf, xlsx, slack-gif, webapp-testing)
+info "ติดตั้ง Python packages สำหรับ document skills..."
+pip3 install --quiet --break-system-packages \
+  pypdf pdfplumber reportlab pytesseract pdf2image \
+  pandas openpyxl \
+  "markitdown[pptx]" Pillow \
+  pillow imageio numpy \
+  playwright 2>/dev/null || true
+success "Python document packages พร้อมแล้ว"
 
 # ─── 5. GitHub CLI ───────────────────────────────────────────────────────────
 section "5/10 GitHub CLI (gh)"
