@@ -85,15 +85,11 @@ wsl --install -d Ubuntu-24.04
 
 รอจนเสร็จ → **Restart เครื่อง**
 
-> ⚠️ **Ubuntu ไม่เปิดเองหลัง restart?** — เป็นเรื่องปกติ ทำตามนี้:
->
-> 1. เปิด **PowerShell** (ไม่ต้อง Admin) แล้วรัน:
->    ```powershell
->    wsl --install -d Ubuntu-24.04
->    ```
->    (รันซ้ำได้ปลอดภัย — ถ้าติดตั้งแล้วจะเปิด Ubuntu ให้เลย)
-> 2. ถ้ายังไม่ได้ → ค้นหา "Ubuntu" ใน Start menu แล้วเปิดเอง
-> 3. ถ้าเจอ error → รัน `wsl --update` ใน PowerShell ก่อน แล้วลองใหม่
+หลัง restart → เปิด **Ubuntu** จาก Start menu (พิมพ์ "Ubuntu" แล้วกด Enter)
+
+> ⚠️ **หา Ubuntu ไม่เจอใน Start menu?**
+> เปิด PowerShell แล้วรัน `wsl` — ถ้าขึ้น error ให้รัน `wsl --update` แล้ว restart อีกครั้ง
+> ถ้าเจอ Error 0x80370102 → ต้องเปิด Virtualization ใน BIOS (ดู [วิธีแก้](#แก้ปัญหา))
 
 ตอน Ubuntu เปิดครั้งแรก → ตั้ง **username + password** (ใช้แค่ใน Linux — ตั้งอะไรก็ได้ที่จำได้)
 
