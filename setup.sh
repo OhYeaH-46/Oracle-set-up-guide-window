@@ -407,11 +407,6 @@ check_tool "tmux"          "tmux"
 check_tool "ripgrep (rg)"  "rg"
 
 echo ""
-echo -e "${BOLD}${YELLOW}⚠ ก่อนใช้งาน:${NC}"
-echo "  1. ปิดแล้วเปิด terminal ใหม่ (หรือรัน: exec zsh)"
-echo "  2. Shell จะเปลี่ยนเป็น zsh โดยอัตโนมัติ"
-echo "  3. รัน 'claude' เพื่อเริ่มใช้งาน Claude Code"
-echo ""
 
 # ─── Optional Oracle Setup ───────────────────────────────────────────────────
 section "Oracle Setup (ตัวเลือกเสริม)"
@@ -462,20 +457,21 @@ if [[ "$SETUP_ORACLE" =~ ^[Yy]$ ]]; then
   echo ""
   echo -e "${GREEN}${BOLD}Oracle '${ORACLE_NAME}' พร้อมแล้ว!${NC}"
   echo ""
-  echo -e "${BOLD}Next steps:${NC}"
-  echo "  1. เปิด terminal ใหม่"
-  echo "  2. รัน: ${ORACLE_NAME}"
-  echo "  3. ใน Claude Code รัน: /awaken"
-  echo "  4. ตั้งชื่อ + บุคลิก Oracle ของคุณ"
+  echo -e "${BOLD}Next steps (หลัง shell restart):${NC}"
+  echo "  1. พิมพ์: ${ORACLE_NAME}"
+  echo "  2. ใน Claude Code พิมพ์: /awaken"
+  echo "  3. ตั้งชื่อ + บุคลิก Oracle ของคุณ"
   echo ""
 else
   echo ""
   echo -e "${GREEN}${BOLD}ใช้ claude ได้เลยค่ะ~!${NC}"
   echo ""
-  echo "  รัน: claude"
-  echo "  หรือ: claude --help"
+  echo "  พิมพ์: claude"
   echo ""
 fi
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo -e "\nおつかれさま~ 🎉\n"
+
+# Auto-switch to zsh — no manual source needed
+exec zsh
