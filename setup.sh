@@ -273,6 +273,10 @@ fi
 # ─── 7. Claude Code ──────────────────────────────────────────────────────────
 section "7/10 Claude Code"
 
+# Ensure ~/.local/bin is in PATH (native installer puts claude here)
+export PATH="$HOME/.local/bin:$PATH"
+grep -q '.local/bin' "$HOME/.bashrc" 2>/dev/null || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+
 if ! has claude; then
   info "ติดตั้ง Claude Code (native installer)..."
   if curl -fsSL https://claude.ai/install.sh | bash; then
