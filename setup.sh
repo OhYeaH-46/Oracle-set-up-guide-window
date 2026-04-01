@@ -102,12 +102,32 @@ sudo apt-get install -y \
   tmux \
   jq \
   unzip \
+  zip \
   zsh \
   python3 \
   python3-pip \
+  python3-venv \
+  python3-dev \
+  python-is-python3 \
+  python3-docx \
+  python3-lxml \
+  python3-bs4 \
+  python3-defusedxml \
   htop \
   ripgrep \
-  fd-find
+  fd-find \
+  sqlite3 \
+  yq \
+  ffmpeg \
+  imagemagick \
+  pandoc \
+  poppler-utils \
+  ghostscript \
+  qpdf \
+  tesseract-ocr \
+  tesseract-ocr-eng \
+  libcairo2-dev \
+  libreoffice
 
 success "System packages พร้อมแล้ว"
 
