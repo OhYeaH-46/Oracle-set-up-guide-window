@@ -349,12 +349,22 @@ section "8/10 Git Config"
 GIT_NAME="$(git config --global user.name 2>/dev/null || true)"
 GIT_EMAIL="$(git config --global user.email 2>/dev/null || true)"
 
+# Auto-detect GitHub username if logged in
+GH_USER="$(gh api user --jq '.login' 2>/dev/null || true)"
+
 if [ -z "$GIT_NAME" ]; then
   echo ""
-  echo "Git ต้องการชื่อของคุณเพื่อบันทึกว่า \"ใครเป็นคนแก้ไฟล์นี้\""
-  echo "ใช้ชื่อจริง, ชื่อเล่น, หรือ GitHub username ก็ได้"
-  echo ""
-  read -rp "ชื่อของคุณ (เช่น Siwatch หรือ OhYeaH): " GIT_NAME
+  echo "Git ต้องการ GitHub username ของคุณ"
+  echo "ใช้บันทึกว่า \"ใครเป็นคนแก้ไฟล์นี้\""
+  if [ -n "$GH_USER" ]; then
+    echo ""
+    echo -e "  พบ GitHub username: ${BOLD}${GH_USER}${NC}"
+    read -rp "ใช้ $GH_USER เลยไหม? (Enter = ใช้, หรือพิมพ์ชื่ออื่น): " GIT_NAME_INPUT
+    GIT_NAME="${GIT_NAME_INPUT:-$GH_USER}"
+  else
+    echo ""
+    read -rp "GitHub username ของคุณ (เช่น Siwatch): " GIT_NAME
+  fi
   git config --global user.name "$GIT_NAME"
   success "Git user.name = $GIT_NAME"
 else
@@ -363,8 +373,12 @@ fi
 
 if [ -z "$GIT_EMAIL" ]; then
   echo ""
-  echo "Email สำหรับ Git — ใช้ email เดียวกับที่สมัคร GitHub"
-  echo "ถ้าไม่อยากเปิดเผย email จริง ใช้: username@users.noreply.github.com"
+  echo "Email สำหรับ Git — แนะนำใช้ noreply email ของ GitHub (ปลอดภัยกว่า)"
+  echo ""
+  echo "หาได้ที่: https://github.com/settings/emails"
+  echo "หน้าตาแบบนี้: 123456789+username@users.noreply.github.com"
+  echo ""
+  echo "หรือจะใช้ email จริงที่สมัคร GitHub ก็ได้"
   echo ""
   read -rp "Email ของคุณ: " GIT_EMAIL
   git config --global user.email "$GIT_EMAIL"

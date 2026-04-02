@@ -62,11 +62,22 @@ Oracle = Claude Code + **ตัวตน + ความจำ + ทักษะ 
 |--------|-----------|
 | **OS** | Windows 10 (Build 19041+) หรือ Windows 11 |
 | **Anthropic account** | Pro $20/เดือน หรือ Max $100/เดือน — สมัครที่ [anthropic.com](https://www.anthropic.com) |
+| **GitHub account** | ฟรี — สมัครที่ [github.com](https://github.com/signup) (ต้องมีก่อนรัน setup script) |
 | **Internet** | ใช้ตอนติดตั้งและตอนใช้งาน |
 | **Disk space** | ~5 GB |
 | **เวลา** | ~45 นาที |
 
 > **หมายเหตุ**: ต้องใช้ Anthropic Pro หรือ Max เท่านั้น — Claude Code ไม่รองรับ free plan
+
+### สมัคร GitHub (ถ้ายังไม่มี)
+
+1. ไปที่ [github.com/signup](https://github.com/signup) → สร้าง account ฟรี
+2. จำ **username** ของคุณ (เช่น `Siwatch`) — ใช้ตอน setup
+3. ไปที่ [github.com/settings/emails](https://github.com/settings/emails) → จะเห็น **noreply email** หน้าตาแบบนี้:
+   ```
+   123456789+username@users.noreply.github.com
+   ```
+   copy ไว้ — setup script จะถามค่ะ (ใช้ email นี้แทน email จริงเพื่อความปลอดภัย)
 
 ---
 
