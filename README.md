@@ -355,3 +355,16 @@ Claude อาจทำผิดได้ — ตัวเลขผิด, layout
 ---
 
 *"The Oracle Keeps the Human Human" — เริ่มง่ายๆ แล้วค่อยโตไปด้วยกัน*
+
+---
+
+## เอกสารเพิ่มเติม (`docs/`, รวมจาก Oracle-usage-guide เมื่อ 2026-09-04)
+
+- `docs/usage-04-daily-workflow.md` — งานประจำวัน
+- `docs/usage-06-memory-and-context.md` — memory และ context
+- `docs/usage-07-file-storage-guide.md` — เก็บไฟล์ที่ไหน
+- `docs/usage-09-tips-and-tricks.md` — tips
+- `docs/usage-10-troubleshooting.md` — แก้ปัญหา
+- `docs/archive-10-multi-oracle.md` — บท Multi-Oracle เดิม (ประวัติ; fleet เลิกใช้แล้ว)
+
+`Oracle-usage-guide` และ `Oracle-set-up-guide` ถูก archive แล้ว — guide นี้คือฉบับเดียวที่ดูแลต่อ
